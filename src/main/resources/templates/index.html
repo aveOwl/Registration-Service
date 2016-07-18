@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <link rel="stylesheet" th:href="@{/css/skeleton.css}"
+          href="/static/css/skeleton.css" />
+    <link rel="stylesheet" th:href="@{/css/normalize.css}"
+          href="/static/css/normalize.css" />
+</head>
+<body>
+
+<div th:replace="fragments/header :: header"></div>
+<hr />
+
+<div class="container">
+
+    <form action="#">
+        <button class="u-pull-right button-primary" type="submit">register</button>
+    </form>
+
+</div>
+
+<hr />
+<div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>
