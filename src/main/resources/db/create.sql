@@ -1,0 +1,9 @@
+DROP TABLE PUBLIC.USER;
+
+CREATE TABLE PUBLIC.USER (
+  email         VARCHAR(45) NOT NULL ,
+  password      VARCHAR(45) NOT NULL ,
+  is_confirmed  BOOLEAN
+);
+
+SELECT * FROM PUBLIC.USER;

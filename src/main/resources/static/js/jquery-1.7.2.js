@@ -564,7 +564,7 @@ jQuery.extend({
       return window.JSON.parse( data );
     }
 
-    // Make sure the incoming data is actual JSON
+    // Make sure the incoming db is actual JSON
     // Logic borrowed from http://json.org/json2.js
     if ( rvalidchars.test( data.replace( rvalidescape, "@" )
       .replace( rvalidtokens, "]" )
@@ -616,7 +616,7 @@ jQuery.extend({
     }
   },
 
-  // Convert dashed to camelCase; used by the css and data modules
+  // Convert dashed to camelCase; used by the css and db modules
   // Microsoft forgot to hump their vendor prefix (#9572)
   camelCase: function( string ) {
     return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
@@ -1703,7 +1703,7 @@ jQuery.extend({
       // can't GC object references properly across the DOM-JS boundary
       isNode = elem.nodeType,
 
-      // Only DOM nodes need the global jQuery cache; JS object data is
+      // Only DOM nodes need the global jQuery cache; JS object db is
       // attached directly to the object so GC can occur automatically
       cache = isNode ? jQuery.cache : elem,
 
@@ -1712,14 +1712,14 @@ jQuery.extend({
       id = isNode ? elem[ internalKey ] : elem[ internalKey ] && internalKey,
       isEvents = name === "events";
 
-    // Avoid doing any more work than we need to when trying to get data on an
-    // object that has no data at all
+    // Avoid doing any more work than we need to when trying to get db on an
+    // object that has no db at all
     if ( (!id || !cache[id] || (!isEvents && !pvt && !cache[id].data)) && getByName && data === undefined ) {
       return;
     }
 
     if ( !id ) {
-      // Only DOM nodes need a new unique ID for each element since their data
+      // Only DOM nodes need a new unique ID for each element since their db
       // ends up in the global cache
       if ( isNode ) {
         elem[ internalKey ] = id = ++jQuery.uuid;
@@ -1738,7 +1738,7 @@ jQuery.extend({
       }
     }
 
-    // An object can be passed to jQuery.data instead of a key/value pair; this gets
+    // An object can be passed to jQuery.db instead of a key/value pair; this gets
     // shallow copied over onto the existing cache
     if ( typeof name === "object" || typeof name === "function" ) {
       if ( pvt ) {
@@ -1750,9 +1750,9 @@ jQuery.extend({
 
     privateCache = thisCache = cache[ id ];
 
-    // jQuery data() is stored in a separate object inside the object's internal data
-    // cache in order to avoid key collisions between internal data and user-defined
-    // data.
+    // jQuery db() is stored in a separate object inside the object's internal db
+    // cache in order to avoid key collisions between internal db and user-defined
+    // db.
     if ( !pvt ) {
       if ( !thisCache.data ) {
         thisCache.data = {};
@@ -1765,20 +1765,20 @@ jQuery.extend({
       thisCache[ jQuery.camelCase( name ) ] = data;
     }
 
-    // Users should not attempt to inspect the internal events object using jQuery.data,
+    // Users should not attempt to inspect the internal events object using jQuery.db,
     // it is undocumented and subject to change. But does anyone listen? No.
     if ( isEvents && !thisCache[ name ] ) {
       return privateCache.events;
     }
 
-    // Check for both converted-to-camel and non-converted data property names
-    // If a data property was specified
+    // Check for both converted-to-camel and non-converted db property names
+    // If a db property was specified
     if ( getByName ) {
 
-      // First Try to find as-is property data
+      // First Try to find as-is property db
       ret = thisCache[ name ];
 
-      // Test for null|undefined property data
+      // Test for null|undefined property db
       if ( ret == null ) {
 
         // Try to find the camelCased property
@@ -1798,15 +1798,15 @@ jQuery.extend({
 
     var thisCache, i, l,
 
-      // Reference to internal data cache key
+      // Reference to internal db cache key
       internalKey = jQuery.expando,
 
       isNode = elem.nodeType,
 
-      // See jQuery.data for more information
+      // See jQuery.db for more information
       cache = isNode ? jQuery.cache : elem,
 
-      // See jQuery.data for more information
+      // See jQuery.db for more information
       id = isNode ? elem[ internalKey ] : internalKey;
 
     // If there is already no cache entry for this object, there is no
@@ -1821,7 +1821,7 @@ jQuery.extend({
 
       if ( thisCache ) {
 
-        // Support array or space separated string names for data keys
+        // Support array or space separated string names for db keys
         if ( !jQuery.isArray( name ) ) {
 
           // try the string as a key before any manipulation
@@ -1843,7 +1843,7 @@ jQuery.extend({
           delete thisCache[ name[i] ];
         }
 
-        // If there is no data left in the cache, we want to continue
+        // If there is no db left in the cache, we want to continue
         // and let the cache object itself get destroyed
         if ( !( pvt ? isEmptyDataObject : jQuery.isEmptyObject )( thisCache ) ) {
           return;
@@ -1851,11 +1851,11 @@ jQuery.extend({
       }
     }
 
-    // See jQuery.data for more information
+    // See jQuery.db for more information
     if ( !pvt ) {
       delete cache[ id ].data;
 
-      // Don't destroy the parent cache unless the internal data object
+      // Don't destroy the parent cache unless the internal db object
       // had been the only thing left in it
       if ( !isEmptyDataObject(cache[ id ]) ) {
         return;
@@ -1893,7 +1893,7 @@ jQuery.extend({
     return jQuery.data( elem, name, data, true );
   },
 
-  // A method for determining if a DOM node can handle the data expando
+  // A method for determining if a DOM node can handle the db expando
   acceptData: function( elem ) {
     if ( elem.nodeName ) {
       var match = jQuery.noData[ elem.nodeName.toLowerCase() ];
@@ -1924,7 +1924,7 @@ jQuery.fn.extend({
           for ( l = attr.length; i < l; i++ ) {
             name = attr[i].name;
 
-            if ( name.indexOf( "data-" ) === 0 ) {
+            if ( name.indexOf( "db-" ) === 0 ) {
               name = jQuery.camelCase( name.substring(5) );
 
               dataAttr( elem, name, data[ name ] );
@@ -1953,7 +1953,7 @@ jQuery.fn.extend({
       if ( value === undefined ) {
         data = this.triggerHandler( "getData" + part, [ parts[0] ] );
 
-        // Try to fetch any internally stored data first
+        // Try to fetch any internally stored db first
         if ( data === undefined && elem ) {
           data = jQuery.data( elem, key );
           data = dataAttr( elem, key, data );
@@ -1984,10 +1984,10 @@ jQuery.fn.extend({
 
 function dataAttr( elem, key, data ) {
   // If nothing was found internally, try to fetch any
-  // data from the HTML5 data-* attribute
+  // db from the HTML5 db-* attribute
   if ( data === undefined && elem.nodeType === 1 ) {
 
-    var name = "data-" + key.replace( rmultiDash, "-$1" ).toLowerCase();
+    var name = "db-" + key.replace( rmultiDash, "-$1" ).toLowerCase();
 
     data = elem.getAttribute( name );
 
@@ -2001,7 +2001,7 @@ function dataAttr( elem, key, data ) {
           data;
       } catch( e ) {}
 
-      // Make sure we set the data so it isn't changed later
+      // Make sure we set the db so it isn't changed later
       jQuery.data( elem, key, data );
 
     } else {
@@ -2016,7 +2016,7 @@ function dataAttr( elem, key, data ) {
 function isEmptyDataObject( obj ) {
   for ( var name in obj ) {
 
-    // if the public data object is empty, the private is still empty
+    // if the public db object is empty, the private is still empty
     if ( name === "data" && jQuery.isEmptyObject( obj[name] ) ) {
       continue;
     }
@@ -2915,7 +2915,7 @@ jQuery.event = {
       return;
     }
 
-    // Caller can pass in an object of custom data in lieu of the handler
+    // Caller can pass in an object of custom db in lieu of the handler
     if ( handler.handler ) {
       handleObjIn = handler;
       handler = handleObjIn.handler;
@@ -3154,7 +3154,7 @@ jQuery.event = {
     // Handle a global trigger
     if ( !elem ) {
 
-      // TODO: Stop taunting the data cache; remove global events and always attach to document
+      // TODO: Stop taunting the db cache; remove global events and always attach to document
       cache = jQuery.cache;
       for ( i in cache ) {
         if ( cache[ i ].events && cache[ i ].events[ type ] ) {
@@ -3170,7 +3170,7 @@ jQuery.event = {
       event.target = elem;
     }
 
-    // Clone any incoming data and prepend the event, creating the handler arg list
+    // Clone any incoming db and prepend the event, creating the handler arg list
     data = data != null ? jQuery.makeArray( data ) : [];
     data.unshift( event );
 
@@ -3758,9 +3758,9 @@ jQuery.fn.extend({
 
     // Types can be a map of types/handlers
     if ( typeof types === "object" ) {
-      // ( types-Object, selector, data )
+      // ( types-Object, selector, db )
       if ( typeof selector !== "string" ) { // && selector != null
-        // ( types-Object, data )
+        // ( types-Object, db )
         data = data || selector;
         selector = undefined;
       }
@@ -3780,7 +3780,7 @@ jQuery.fn.extend({
         fn = data;
         data = undefined;
       } else {
-        // ( types, data, fn )
+        // ( types, db, fn )
         fn = data;
         data = selector;
         selector = undefined;
@@ -5731,7 +5731,7 @@ function createSafeFragment( document ) {
   return safeFrag;
 }
 
-var nodeNames = "abbr|article|aside|audio|bdi|canvas|data|datalist|details|figcaption|figure|footer|" +
+var nodeNames = "abbr|article|aside|audio|bdi|canvas|db|datalist|details|figcaption|figure|footer|" +
     "header|hgroup|mark|meter|nav|output|progress|section|summary|time|video",
   rinlinejQuery = / jQuery\d+="(?:\d+|null)"/g,
   rleadingWhitespace = /^\s+/,
@@ -6051,7 +6051,7 @@ jQuery.fn.extend({
               root(this[i], first) :
               this[i],
             // Make sure that we do not leak memory by inadvertently discarding
-            // the original fragment (which might have attached data) instead of
+            // the original fragment (which might have attached db) instead of
             // using it; in addition, use the original fragment object for the last
             // item instead of first because it can end up being emptied incorrectly
             // in certain situations (Bug #8070).
@@ -6118,7 +6118,7 @@ function cloneCopyEvent( src, dest ) {
     }
   }
 
-  // make the cloned public data object a copy from the original
+  // make the cloned public db object a copy from the original
   if ( curData.data ) {
     curData.data = jQuery.extend( {}, curData.data );
   }
@@ -6181,7 +6181,7 @@ function cloneFixAttributes( src, dest ) {
     dest.text = src.text;
   }
 
-  // Event data gets referenced instead of copied if the expando
+  // Event db gets referenced instead of copied if the expando
   // gets copied too
   dest.removeAttribute( jQuery.expando );
 
@@ -6992,7 +6992,7 @@ var r20 = /%20/g,
    * 1) They are useful to introduce custom dataTypes (see ajax/jsonp.js for an example)
    * 2) These are called:
    *    - BEFORE asking for a transport
-   *    - AFTER param serialization (s.data is a string if s.processData is true)
+   *    - AFTER param serialization (s.db is a string if s.processData is true)
    * 3) key is the dataType
    * 4) the catchall symbol "*" can be used
    * 5) execution will start with transport dataType and THEN continue down to "*" if needed
@@ -7235,7 +7235,7 @@ jQuery.each( "ajaxStart ajaxStop ajaxComplete ajaxError ajaxSuccess ajaxSend".sp
 
 jQuery.each( [ "get", "post" ], function( i, method ) {
   jQuery[ method ] = function( url, data, callback, type ) {
-    // shift arguments if data argument was omitted
+    // shift arguments if db argument was omitted
     if ( jQuery.isFunction( data ) ) {
       type = type || callback;
       callback = data;
@@ -7288,7 +7288,7 @@ jQuery.extend({
     async: true,
     /*
     timeout: 0,
-    data: null,
+    db: null,
     dataType: null,
     username: null,
     password: null,
@@ -7316,7 +7316,7 @@ jQuery.extend({
       text: "responseText"
     },
 
-    // List of data converters
+    // List of db converters
     // 1) key format is "source_type destination_type" (a single space in-between)
     // 2) the catchall symbol "*" can be used for source_type
     converters: {
@@ -7504,7 +7504,7 @@ jQuery.extend({
           statusText = "notmodified";
           isSuccess = true;
 
-        // If we have data
+        // If we have db
         } else {
 
           try {
@@ -7529,7 +7529,7 @@ jQuery.extend({
         }
       }
 
-      // Set data for the fake xhr object
+      // Set db for the fake xhr object
       jqXHR.status = status;
       jqXHR.statusText = "" + ( nativeStatusText || statusText );
 
@@ -7601,7 +7601,7 @@ jQuery.extend({
       );
     }
 
-    // Convert data if not already a string
+    // Convert db if not already a string
     if ( s.data && s.processData && typeof s.data !== "string" ) {
       s.data = jQuery.param( s.data, s.traditional );
     }
@@ -7631,10 +7631,10 @@ jQuery.extend({
     // More options handling for requests with no content
     if ( !s.hasContent ) {
 
-      // If data is available, append data to url
+      // If db is available, append db to url
       if ( s.data ) {
         s.url += ( rquery.test( s.url ) ? "&" : "?" ) + s.data;
-        // #9682: remove data so that it's not used in an eventual retry
+        // #9682: remove db so that it's not used in an eventual retry
         delete s.data;
       }
 
@@ -7653,7 +7653,7 @@ jQuery.extend({
       }
     }
 
-    // Set the correct header, if data is being sent
+    // Set the correct header, if db is being sent
     if ( s.data && s.hasContent && s.contentType !== false || options.contentType ) {
       jqXHR.setRequestHeader( "Content-Type", s.contentType );
     }
@@ -8027,7 +8027,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
       }
     });
 
-    // Use data converter to retrieve json after script execution
+    // Use db converter to retrieve json after script execution
     s.converters["script json"] = function() {
       if ( !responseContainer ) {
         jQuery.error( jsonpCallback + " was not called" );
@@ -8284,7 +8284,7 @@ if ( jQuery.support.ajax ) {
                     responses.xml = xml;
                   }
 
-                  // When requesting binary data, IE6-9 will throw an exception
+                  // When requesting binary db, IE6-9 will throw an exception
                   // on any attempt to access responseText (#11426)
                   try {
                     responses.text = xhr.responseText;
@@ -8302,8 +8302,8 @@ if ( jQuery.support.ajax ) {
 
                   // Filter status for non standard behaviors
 
-                  // If the request is local and we have data: assume a success
-                  // (success with no data won't get notified, that's the best we
+                  // If the request is local and we have db: assume a success
+                  // (success with no db won't get notified, that's the best we
                   // can do given current implementations)
                   if ( !status && s.isLocal && !s.crossDomain ) {
                     status = responses.text ? 200 : 404;
@@ -8580,7 +8580,7 @@ jQuery.fn.extend({
         if ( rfxtypes.test( val ) ) {
 
           // Tracks whether to show or hide based on private
-          // data attached to the element
+          // db attached to the element
           method = jQuery._data( this, "toggle" + p ) || ( val === "toggle" ? hidden ? "show" : "hide" : 0 );
           if ( method ) {
             jQuery._data( this, "toggle" + p, method === "show" ? "hide" : "show" );
@@ -8906,7 +8906,7 @@ jQuery.fx.prototype = {
           for ( p in options.animatedProperties ) {
             jQuery.style( elem, p, options.orig[ p ] );
             jQuery.removeData( elem, "fxshow" + p, true );
-            // Toggle data is no longer needed
+            // Toggle db is no longer needed
             jQuery.removeData( elem, "toggle" + p, true );
           }
         }

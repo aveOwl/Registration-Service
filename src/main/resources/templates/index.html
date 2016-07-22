@@ -13,12 +13,36 @@
 <div th:replace="fragments/header :: header"></div>
 <hr />
 
-<div class="container">
+<div class="container" th:if="${home}">
 
-    <form action="#">
+    <form th:action="@{/registration/form}" method="get">
         <button class="u-pull-right button-primary" type="submit">register</button>
     </form>
 
+</div>
+
+<div class="container" th:if="${register}">
+
+    <form th:action="@{/registration/form}" method="post">
+        <div class="row">
+            <div class="six columns">
+                <label for="email">Email</label>
+                <input class="u-full-width" type="email" id="email" name="email" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="six columns">
+                <label for="password">Password</label>
+                <input class="u-full-width" type="password" id="password" name="password" />
+                <button class="button-primary u-pull-right" type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<div class="container" th:if="${confirm}">
+    <h1>Check Your Email !</h1>
 </div>
 
 <hr />
