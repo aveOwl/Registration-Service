@@ -5,12 +5,22 @@ spring:
     cache: false
   datasource:
     url: jdbc:hsqldb:mem:register
+    data-username: SA
+    data-password:
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: create
+    database: hsql
 # Configure server port
 server:
   tomcat:
     basedir: targe/tomcat
   port: 9090
+logging:
+  level:
+    com:
+      registration: debug
+    org:
+      hibernate: debug

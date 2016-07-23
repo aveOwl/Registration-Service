@@ -26,6 +26,16 @@ public class RegisterControllerTest {
 
     @MockBean
     private UserService userService;
+    
+    private static final String VIEW_NAME = "index";
+
+    private static final String VALID_EMAIL = "sample@gmail.com";
+
+    private static final String INVALID_EMAIL = "same@.qwe.com";
+
+    private static final String VALID_PASSWORD = "password12!";
+
+    private static final String INVALID_PASSWORD = "password";
 
     @Test
     public void shouldRedirectFromRootContext() throws Exception {
@@ -39,17 +49,7 @@ public class RegisterControllerTest {
         mvc.perform(get("/registration"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("home", true))
-                .andExpect(view().name("index"));
-    }
-
-    @Test
-    public void shouldObtainUserInfoAndSaveUser() throws Exception {
-        mvc.perform(post("/registration/form")
-                .param("email", "test")
-                .param("password", "test"))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("confirm", true))
-                .andExpect(view().name("index"));
+                .andExpect(view().name(VIEW_NAME));
     }
 
     @Test
@@ -57,6 +57,43 @@ public class RegisterControllerTest {
         mvc.perform(get("/registration/form"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("register", true))
-                .andExpect(view().name("index"));
+                .andExpect(view().name(VIEW_NAME));
+    }
+
+    @Test
+    public void shouldReturnCurrentPageOnInvalidInput() throws Exception {
+        mvc.perform(post("/registration/form")
+                .param("email", VALID_EMAIL)
+                .param("password", INVALID_PASSWORD))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeHasFieldErrorCode("user", "password", "Pattern"))
+                .andExpect(model().attribute("register", true))
+                .andExpect(view().name(VIEW_NAME));
+
+        mvc.perform(post("/registration/form")
+                .param("email", INVALID_EMAIL)
+                .param("password", VALID_PASSWORD))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeHasFieldErrorCode("user", "email", "Email"))
+                .andExpect(model().attribute("register", true))
+                .andExpect(view().name(VIEW_NAME));
+
+        mvc.perform(post("/registration/form")
+                .param("email", INVALID_EMAIL)
+                .param("password", INVALID_PASSWORD))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeHasFieldErrorCode("user", "email", "Email"))
+                .andExpect(model().attributeHasFieldErrorCode("user", "password", "Pattern"))
+                .andExpect(model().attribute("register", true))
+                .andExpect(view().name(VIEW_NAME));
+    }
+
+    @Test
+    public void shouldRedirectToConfirmPageOnValidInput() throws Exception {
+        mvc.perform(post("/registration/form")
+                .param("email", VALID_EMAIL)
+                .param("password", VALID_PASSWORD))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/registration/form/confirm"));
     }
 }

@@ -23,17 +23,22 @@
 
 <div class="container" th:if="${register}">
 
-    <form th:action="@{/registration/form}" method="post">
+    <form th:action="@{/registration/form}"
+          th:object="${user}"
+          method="post"
+          novalidate="novalidate">
         <div class="row">
             <div class="six columns">
                 <label for="email">Email</label>
-                <input class="u-full-width" type="email" id="email" name="email" />
+                <input class="u-full-width" type="email" id="email" th:field="*{email}" />
+                <span class="has-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</span>
             </div>
         </div>
         <div class="row">
             <div class="six columns">
                 <label for="password">Password</label>
-                <input class="u-full-width" type="password" id="password" name="password" />
+                <input class="u-full-width" type="password" id="password" th:field="*{password}" />
+                <span class="has-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</span>
                 <button class="button-primary u-pull-right" type="submit">Submit</button>
             </div>
         </div>
