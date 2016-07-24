@@ -9,8 +9,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.registration.util.Points.CONFIRM;
+import static com.registration.util.Points.CONFIRM_VIEW;
+import static com.registration.util.Points.MAIN;
+import static com.registration.util.Points.MAIN_VIEW;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest
-public class RegisterControllerTest {
+public class MainControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -27,8 +32,6 @@ public class RegisterControllerTest {
     @MockBean
     private UserService userService;
     
-    private static final String VIEW_NAME = "index";
-
     private static final String VALID_EMAIL = "sample@gmail.com";
 
     private static final String INVALID_EMAIL = "same@.qwe.com";
@@ -38,62 +41,53 @@ public class RegisterControllerTest {
     private static final String INVALID_PASSWORD = "password";
 
     @Test
-    public void shouldRedirectFromRootContext() throws Exception {
-        mvc.perform(get("/"))
-                .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/registration"));
-    }
-
-    @Test
     public void shouldDisplayDefaultHomePage() throws Exception {
-        mvc.perform(get("/registration"))
+        mvc.perform(get(MAIN))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("home", true))
-                .andExpect(view().name(VIEW_NAME));
-    }
-
-    @Test
-    public void shouldDisplayFormPage() throws Exception {
-        mvc.perform(get("/registration/form"))
-                .andExpect(status().isOk())
-                .andExpect(model().attribute("register", true))
-                .andExpect(view().name(VIEW_NAME));
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(MAIN_VIEW));
     }
 
     @Test
     public void shouldReturnCurrentPageOnInvalidInput() throws Exception {
-        mvc.perform(post("/registration/form")
+        mvc.perform(post(MAIN)
                 .param("email", VALID_EMAIL)
                 .param("password", INVALID_PASSWORD))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeHasFieldErrorCode("user", "password", "Pattern"))
-                .andExpect(model().attribute("register", true))
-                .andExpect(view().name(VIEW_NAME));
+                .andExpect(view().name(MAIN_VIEW));
 
-        mvc.perform(post("/registration/form")
+        mvc.perform(post(MAIN)
                 .param("email", INVALID_EMAIL)
                 .param("password", VALID_PASSWORD))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeHasFieldErrorCode("user", "email", "Email"))
-                .andExpect(model().attribute("register", true))
-                .andExpect(view().name(VIEW_NAME));
+                .andExpect(view().name(MAIN_VIEW));
 
-        mvc.perform(post("/registration/form")
+        mvc.perform(post(MAIN)
                 .param("email", INVALID_EMAIL)
                 .param("password", INVALID_PASSWORD))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeHasFieldErrorCode("user", "email", "Email"))
                 .andExpect(model().attributeHasFieldErrorCode("user", "password", "Pattern"))
-                .andExpect(model().attribute("register", true))
-                .andExpect(view().name(VIEW_NAME));
+                .andExpect(view().name(MAIN_VIEW));
     }
 
     @Test
     public void shouldRedirectToConfirmPageOnValidInput() throws Exception {
-        mvc.perform(post("/registration/form")
+        mvc.perform(post(MAIN)
                 .param("email", VALID_EMAIL)
                 .param("password", VALID_PASSWORD))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/registration/form/confirm"));
+                .andExpect(model().hasNoErrors())
+                .andExpect(redirectedUrl(MAIN + CONFIRM));
+    }
+
+    @Test
+    public void shouldDisplayConfirmMessage() throws Exception {
+        mvc.perform(get(MAIN + CONFIRM))
+                .andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name(CONFIRM_VIEW));
     }
 }

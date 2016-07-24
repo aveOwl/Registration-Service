@@ -1,26 +1,22 @@
-# Allow Thymeleaf templates to be reloaded at dev time
-# Configure db source
+##
+# Allow Thymeleaf templates to be reloaded at dev time.
+##
 spring:
   thymeleaf:
     cache: false
-  datasource:
-    url: jdbc:hsqldb:mem:register
-    data-username: SA
-    data-password:
-    driver-class-name: org.hsqldb.jdbc.JDBCDriver
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create
-    database: hsql
-# Configure server port
+
+##
+# Tomcat configuration.
+##
 server:
   tomcat:
     basedir: targe/tomcat
   port: 9090
+
+##
+# Logging configuration.
+##
 logging:
   level:
     com:
       registration: debug
-    org:
-      hibernate: debug

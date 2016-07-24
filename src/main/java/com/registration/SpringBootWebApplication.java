@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.support.ResourceBundleMessageSource;
 
 /**
  * Launches spring application.
@@ -26,7 +24,7 @@ public class SpringBootWebApplication {
      * @param args command-line arguments
      */
     public static void main(final String[] args) {
-        LOG.info("starting spring application ...");
+        LOG.info("Starting spring application...");
         SpringApplication.run(SpringBootWebApplication.class, args);
     }
 }

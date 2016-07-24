@@ -7,47 +7,62 @@
           href="/static/css/skeleton.css" />
     <link rel="stylesheet" th:href="@{/css/normalize.css}"
           href="/static/css/normalize.css" />
+    <link rel="stylesheet" th:href="@{/css/custom.css}"
+          href="/static/css/custom.css" />
+    <script th:src="@{/js/jquery.js}"
+            src="/static/js/jquery.js"></script>
+    <script th:src="@{/js/jquery.storageapi.min.js}"
+            src="/static/js/jquery.storageapi.min.js"></script>
+    <script th:src="@{/js/register.js}"
+            src="/static/js/register.js"></script>
 </head>
 <body>
 
 <div th:replace="fragments/header :: header"></div>
 <hr />
 
-<div class="container" th:if="${home}">
-
-    <form th:action="@{/registration/form}" method="get">
-        <button class="u-pull-right button-primary" type="submit">register</button>
-    </form>
-
+<div id="home" class="container">
+    <button class="u-pull-right button-primary" type="submit">Register</button>
 </div>
 
-<div class="container" th:if="${register}">
+<div id="register" class="container hidden">
 
-    <form th:action="@{/registration/form}"
+    <form th:action="@{/registration}"
           th:object="${user}"
           method="post"
           novalidate="novalidate">
         <div class="row">
             <div class="six columns">
                 <label for="email">Email</label>
-                <input class="u-full-width" type="email" id="email" th:field="*{email}" />
-                <span class="has-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</span>
+                <input id="email"
+                       class="u-full-width"
+                       type="email"
+                       th:field="*{email}" />
+                <span class="has-error"
+                      th:if="${#fields.hasErrors('email')}"
+                      th:errors="*{email}">
+                </span>
             </div>
         </div>
         <div class="row">
             <div class="six columns">
                 <label for="password">Password</label>
-                <input class="u-full-width" type="password" id="password" th:field="*{password}" />
-                <span class="has-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</span>
-                <button class="button-primary u-pull-right" type="submit">Submit</button>
+                <input id="password"
+                       class="u-full-width"
+                       type="password"
+                       th:field="*{password}" />
+                <span class="has-error"
+                      th:if="${#fields.hasErrors('password')}"
+                      th:errors="*{password}">
+                </span>
+
+                <input class="button-primary u-pull-right"
+                       type="submit"
+                       value="Submit" />
             </div>
         </div>
     </form>
 
-</div>
-
-<div class="container" th:if="${confirm}">
-    <h1>Check Your Email !</h1>
 </div>
 
 <hr />

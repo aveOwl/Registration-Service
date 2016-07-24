@@ -1,0 +1,8 @@
+.has-error {
+    color: #a94442;
+}
+
+.hidden {
+    display: none;
+    visibility: hidden;
+}

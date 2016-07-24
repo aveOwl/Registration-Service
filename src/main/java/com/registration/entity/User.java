@@ -44,8 +44,7 @@ public class User {
      */
     @Column(name = "password")
     @NotEmpty(message = "Choose a password")
-    @Pattern(regexp = PASSWORD_REGEXP,
-             message = "Password is invalid")
+    @Pattern(regexp = PASSWORD_REGEXP, message = "Password is invalid")
     private String password;
 
     /**
@@ -96,8 +95,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
+                "email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", isConfirmed=" + isConfirmed +
                 '}';
