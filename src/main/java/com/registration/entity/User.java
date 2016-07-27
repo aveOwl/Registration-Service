@@ -8,13 +8,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Pattern;
 
 /**
  * User entity class.
  */
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
     /**
@@ -31,9 +32,9 @@ public class User {
      * Email must be valid according to
      * {@link Email} annotation.
      */
-    @Column(name = "email")
     @NotEmpty(message = "Input your email address")
     @Email(message = "Email is invalid")
+    @Column(name = "email")
     private String email;
 
     /**
@@ -42,9 +43,8 @@ public class User {
      * - at least one "!" symbol.
      * - at least 6 at most 20 characters long.
      */
-    @Column(name = "password")
-    @NotEmpty(message = "Choose a password")
     @Pattern(regexp = PASSWORD_REGEXP, message = "Password is invalid")
+    @Column(name = "password")
     private String password;
 
     /**

@@ -12,7 +12,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.4.0.RC1</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/><!-- lookup parent from repository -->
     </parent>
 
     <name>Registration Service</name>
@@ -21,9 +21,12 @@
         <project.build.finalName>RegistrationService</project.build.finalName>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
         <thymeleaf.version>2.1.2.RELEASE</thymeleaf.version>
         <spring.jms.version>4.2.5.RELEASE</spring.jms.version>
-        <java.version>1.8</java.version>
+        <skeleton.version>2.0.4</skeleton.version>
+        <jquery.version>2.1.4</jquery.version>
+        <angular.version>1.5.7</angular.version>
         <check.style.plugin.version>2.7</check.style.plugin.version>
         <jacoco.plugin.version>0.7.4.201502262128</jacoco.plugin.version>
     </properties>
@@ -34,10 +37,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
@@ -61,15 +60,19 @@
             <artifactId>hsqldb</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
         <!--JMS SUPPORT-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-activemq</artifactId>
         </dependency>
-        <!--<dependency>
+        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
-        </dependency>-->
+        </dependency>
         <!--HIBERNATE VALIDATOR-->
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -81,11 +84,22 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--THYMELEAF SPRING-->
-        <!--<dependency>
-            <groupId>org.thymeleaf</groupId>
-            <artifactId>thymeleaf-spring4</artifactId>
-        </dependency>-->
+        <!--WEB JARS-->
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>skeleton-css</artifactId>
+            <version>${skeleton.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>${jquery.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>angularjs</artifactId>
+            <version>${angular.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

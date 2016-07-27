@@ -1,0 +1,15 @@
+.has-error {
+    color: #a94442 !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.field-error {
+    border-color: #a94442 !important;
+}
+
+.field-valid {
+    border-color: #33C3F0 !important;
+}

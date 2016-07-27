@@ -6,6 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityExistsException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,7 +21,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User save(final User user) {
-        return userRepository.save(user);
+        return userRepository.saveAndFlush(user);
     }
 }
