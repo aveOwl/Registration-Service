@@ -11,6 +11,7 @@ import org.springframework.util.Assert;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -60,5 +61,19 @@ public class UserServiceImpl implements UserService {
 
         LOG.debug("Updating user: {}", user);
         return userRepository.saveAndFlush(user);
+    }
+
+    @Override
+    public void confirm(final String email) {
+        final User user = findByEmail(email);
+
+        if (user != null) {
+            user.setConfirmed(true);
+            update(user);
+            LOG.debug("User: {} is confirmed.", user);
+        } else {
+            LOG.error("With given email: {} no users found", email);
+            throw new NoResultException("Confirmation link is invalid.");
+        }
     }
 }

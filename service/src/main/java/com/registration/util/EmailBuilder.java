@@ -102,7 +102,6 @@ public class EmailBuilder {
                 Base64Utils.encodeToString((user.getEmail() + ":" + user.getPassword()).getBytes());
     }
 
-
     /**
      * Constructs conformation email text.
      * Populates email body model and converts
@@ -143,7 +142,7 @@ public class EmailBuilder {
      * @param request user's registration request.
      * @return fully composed conformation email message.
      */
-    private MimeMessage createEmail(final User user, final HttpServletRequest request) {
+    public MimeMessage createEmail(final User user, final HttpServletRequest request) {
         try {
             final MimeMessage message = this.mailSender.createMimeMessage();
             final MimeMessageHelper helper = new MimeMessageHelper(message, true);

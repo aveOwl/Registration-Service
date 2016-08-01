@@ -1,7 +1,7 @@
 package com.registration.controller;
 
 import com.registration.model.User;
-import com.registration.service.ConfirmService;
+import com.registration.service.MailService;
 import com.registration.service.UserService;
 import com.registration.util.ValidationResult;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class RegisterController {
     private static final Logger LOG = LoggerFactory.getLogger(RegisterController.class);
 
     private UserService userService;
-    private ConfirmService confirmService;
+    private MailService mailService;
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -33,8 +33,8 @@ public class RegisterController {
     }
 
     @Autowired
-    public void setConfirmService(ConfirmService confirmService) {
-        this.confirmService = confirmService;
+    public void setMailService(MailService mailService) {
+        this.mailService = mailService;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -58,7 +58,7 @@ public class RegisterController {
 
         if (!bindingResult.hasErrors()) {
             userService.create(user);
-            confirmService.confirm(user, request);
+            mailService.sendMail(user, request);
         } else {
             LOG.error("User verification failed: {}", bindingResult.getFieldErrors());
         }

@@ -13,6 +13,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 
 import static org.junit.Assert.assertEquals;
@@ -30,14 +32,13 @@ public class UserServiceTest {
     private UserService userService;
 
     @MockBean
-    private ConfirmService confirmService;
+    private MailService mailService;
 
     @MockBean
     private HttpServletRequest request;
 
     @MockBean
     private UserRepository userRepository;
-
 
     private static final String EMAIL = "email@domain.com";
     private static final String PASSWORD = "password";
@@ -47,7 +48,7 @@ public class UserServiceTest {
     @Before
     public void setUp() throws Exception {
         user = new User(EMAIL, PASSWORD);
-        doNothing().when(confirmService).confirm(user, request);
+        doNothing().when(mailService).sendMail(user, request);
     }
 
     @After
@@ -56,13 +57,13 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldReturnUserByEmail() throws Exception {
+    public void shouldFindUserByEmail() throws Exception {
         given(userRepository.findByEmail(EMAIL))
                 .willReturn(user);
 
-        User byEmail = userService.findByEmail(EMAIL);
+        User user = userService.findByEmail(EMAIL);
 
-        assertEquals(byEmail.getPassword(), PASSWORD);
+        assertEquals(user.getPassword(), PASSWORD);
     }
 
     @Test
@@ -76,7 +77,7 @@ public class UserServiceTest {
     }
 
     @Test(expected = EntityExistsException.class)
-    public void shouldThrowExceptionOnDuplicateEmail() throws Exception {
+    public void shouldFailToCreateWithExistingEmail() throws Exception {
         given(userRepository.findByEmail(EMAIL))
                 .willReturn(user);
 
@@ -85,8 +86,58 @@ public class UserServiceTest {
         verify(userRepository, never()).saveAndFlush(user);
     }
 
+    @Test
+    public void shouldUpdateUser() throws Exception {
+        user.setId(99L);
+
+        userService.update(user);
+
+        verify(userRepository, atLeastOnce()).saveAndFlush(user);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void shouldFailToUpdateWithNullId() throws Exception {
+        user.setId(null);
+
+        userService.update(user);
+
+        verify(userRepository, never()).saveAndFlush(user);
+    }
+
+
+    @Test
+    public void shouldConfirmUser() throws Exception {
+        given(userRepository.findByEmail(EMAIL))
+                .willReturn(user);
+        user.setId(99L);
+
+        userService.confirm(EMAIL);
+
+        verify(userRepository, atLeastOnce()).saveAndFlush(user);
+    }
+
+    @Test(expected = NoResultException.class)
+    public void shouldFailToConfirmInvalidLink() throws Exception {
+        given(userRepository.findByEmail(EMAIL))
+                .willReturn(null);
+
+        userService.confirm(EMAIL);
+
+        verify(userRepository, never()).saveAndFlush(user);
+    }
+
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowExceptionOnNullUser() throws Exception {
+    public void shouldFailToCreateNullUser() throws Exception {
         userService.create(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailToUpdateNullUser() throws Exception {
+        userService.update(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailToFindByNullEmail() throws Exception {
+        userService.findByEmail(null);
     }
 }

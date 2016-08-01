@@ -1,7 +1,7 @@
 package com.registration.service;
 
 import com.registration.model.User;
-import com.registration.service.impl.ConfirmServiceImpl;
+import com.registration.service.impl.MailServiceImpl;
 import com.registration.util.EmailBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -19,11 +19,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = ConfirmServiceImpl.class)
-public class ConfirmServiceTest {
+@ContextConfiguration(classes = MailServiceImpl.class)
+public class MailServiceTest {
 
     @Autowired
-    private ConfirmService confirmService;
+    private MailService mailService;
 
     @MockBean
     private EmailBuilder emailBuilder;
@@ -44,15 +44,15 @@ public class ConfirmServiceTest {
     }
 
     @Test
-    public void shouldConfirmWithoutError() throws Exception {
-        confirmService.confirm(user, request);
+    public void shouldSendWithoutError() throws Exception {
+        mailService.sendMail(user, request);
 
         verify(emailBuilder, atLeastOnce()).sendEmail(user, request);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowExceptionOnNullUser() throws Exception {
-        confirmService.confirm(null , request);
+        mailService.sendMail(null , request);
 
         verify(emailBuilder, never()).sendEmail(null, request);
     }

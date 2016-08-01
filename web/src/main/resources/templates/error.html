@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Video</title>
+    <title>Error</title>
     <meta charset="UTF-8" />
     <link rel="stylesheet" th:href="@{/webjars/skeleton-css/2.0.4/css/skeleton.css}"
           href="webjars/skeleton-css/2.0.4/css/skeleton.css" />
@@ -11,15 +11,14 @@
 <body>
 
 <div class="container">
-    <h1>You have successfully entered</h1>
+    <div class="one-half column">
+        <h1>Error</h1>
+    </div>
 </div>
 <hr />
 
 <div class="container">
-    <iframe width="854" height="480"
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-            frameborder="0"
-            allowfullscreen="allowfullscreen"></iframe>
+    <h3 th:text="${errorMsg}"></h3>
 </div>
 
 <hr/>
