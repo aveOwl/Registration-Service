@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registration Service</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" th:href="@{/webjars/skeleton-css/2.0.4/css/skeleton.css}"
+          href="webjars/skeleton-css/2.0.4/css/skeleton.css" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/static/css/style.css" />
+    <script th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"
+            src="webjars/jquery/2.1.4/jquery.min.js"></script>
+    <script th:src="@{/js/script.js}" src="/static/js/script.js"></script>
+</head>
+<body>
+
+<div th:replace="fragments/header :: header"></div>
+<hr />
+
+<!-- Home Section-->
+<div id="home" class="container">
+    <button id="homeButton" class="u-pull-right button-primary" type="submit">Register</button>
+</div>
+
+<!-- Form Section-->
+<div id="register" class="container hidden">
+
+    <form id="registerForm" th:action="@{/registration}" th:object="${user}" method="post" novalidate="novalidate">
+        <!--Email Field-->
+        <div class="row">
+            <div class="six columns">
+                <label for="email">Email</label>
+                <input id="email"
+                       name="email"
+                       placeholder="john@domain.com"
+                       class="u-full-width"
+                       type="email"
+                       th:field="*{email}" />
+                <span id="emailError" class="has-error"></span>
+                <span id="emailTaken" class="has-error"></span>
+            </div>
+        </div>
+        <!--Password Field-->
+        <div class="row">
+            <div class="six columns">
+                <label for="password">Password</label>
+                <input id="password"
+                       name="password"
+                       placeholder="password"
+                       class="u-full-width"
+                       type="password"
+                       th:field="*{password}" />
+                <span id="passwordError" class="has-error"></span>
+            </div>
+        </div>
+        <!--Submit Button Field-->
+        <div class="row">
+            <div class="six columns">
+                <input class="button-primary u-pull-right" type="submit" value="Submit" />
+            </div>
+        </div>
+        <span id="serverError"></span>
+    </form>
+
+</div>
+
+<!-- Conformation Section-->
+<div id="confirm" class="container hidden">
+    <h1>Check Your Email !</h1>
+</div>
+
+<hr />
+<div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>
