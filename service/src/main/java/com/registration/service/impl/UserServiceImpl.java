@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.Base64Utils;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
@@ -64,16 +65,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void confirm(final String email) {
-        final User user = findByEmail(email);
+    public void confirm(final String code) {
+        try {
+            byte[] decodedData = Base64Utils.decodeFromString(code);
 
-        if (user != null) {
-            user.setConfirmed(true);
-            update(user);
-            LOG.debug("User: {} is confirmed.", user);
-        } else {
-            LOG.error("With given email: {} no users found", email);
-            throw new NoResultException("Confirmation link is invalid.");
+            // array contains user email and password
+            // {'email', ':', 'password'}
+            final String[] data = new String(decodedData).split(":");
+
+            final User user = findByEmail(data[0]);
+
+            if (user != null) {
+                user.setConfirmed(true);
+                update(user);
+                LOG.debug("User: {} is confirmed.", user);
+            }
+        } catch (IllegalArgumentException e) {
+            LOG.error("Invalid confirmation link: {}", code);
+            throw new NoResultException("Invalid confirmation link.");
         }
     }
 }

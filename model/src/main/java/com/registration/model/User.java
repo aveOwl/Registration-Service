@@ -22,6 +22,11 @@ public class User {
      */
     private static final String PASSWORD_REGEXP = "((?=(.*\\d){2})(?=.*[!]).{6,20})";
 
+    static final String EMPTY_EMAIL_MSG = "Input your email address.";
+    static final String INVALID_EMAIL_MSG = "Email is invalid.";
+    static final String EMPTY_PASSWORD_MSG = "Input your password.";
+    static final String INVALID_PASSWORD_MSG = "Password is invalid.";
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -31,8 +36,8 @@ public class User {
      * Email must be valid according to
      * {@link Email} annotation.
      */
-    @NotEmpty(message = "Input your email address")
-    @Email(message = "Email is invalid")
+    @NotEmpty(message = EMPTY_EMAIL_MSG)
+    @Email(message = INVALID_EMAIL_MSG)
     @Column(name = "email")
     private String email;
 
@@ -42,7 +47,8 @@ public class User {
      * - at least one "!" symbol.
      * - at least 6 at most 20 characters long.
      */
-    @Pattern(regexp = PASSWORD_REGEXP, message = "Password is invalid")
+    @NotEmpty(message = EMPTY_PASSWORD_MSG)
+    @Pattern(regexp = PASSWORD_REGEXP, message = INVALID_PASSWORD_MSG)
     @Column(name = "password")
     private String password;
 
@@ -89,6 +95,34 @@ public class User {
 
     public void setConfirmed(final boolean confirmed) {
         isConfirmed = confirmed;
+    }
+
+    /**
+     * Compares this user to the specified user.
+     * @param other the other user.
+     * @return true if this user equals other; false otherwise.
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) return true;
+        if (other == null) return false;
+        if (other.getClass() != this.getClass()) return false;
+        User that = (User) other;
+        return (this.email.equals(that.email)) &&
+               (this.password.equals(that.password) &&
+                this.isConfirmed == that.isConfirmed);
+    }
+
+    /**
+     * Returns a hash code for this user.
+     * @return a hash code for this user.
+     */
+    @Override
+    public int hashCode() {
+        int hash = 17;
+        hash = 31*hash + email.hashCode();
+        hash = 31*hash + password.hashCode();
+        return hash;
     }
 
     @Override

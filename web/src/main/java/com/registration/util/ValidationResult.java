@@ -63,8 +63,7 @@ public class ValidationResult {
         // Build Email Violation message.
         if (invalidEmail) {
             for (FieldError error : bindingResult.getFieldErrors("email")) {
-                emailMessageBuilder.append(error.getDefaultMessage())
-                        .append("\n");
+                emailMessageBuilder.append(error.getDefaultMessage());
             }
         }
         emailViolationMessage = emailMessageBuilder.toString();
@@ -72,8 +71,7 @@ public class ValidationResult {
         // Build Password Violation message.
         if (invalidPassword) {
             for (FieldError error : bindingResult.getFieldErrors("password")) {
-                passwordMessageBuilder.append(error.getDefaultMessage())
-                        .append("\n");
+                passwordMessageBuilder.append(error.getDefaultMessage());
             }
         }
         passwordViolationMessage = passwordMessageBuilder.toString();

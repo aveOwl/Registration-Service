@@ -21,5 +21,6 @@
         <a href=${confirmUrl}>${confirmUrl}</a>
     </p>
 </div>
+
 </body>
 </html>

@@ -15,8 +15,9 @@
     <name>Web</name>
 
     <properties>
-        <skeleton.version>2.0.4</skeleton.version>
+        <angular.version>1.5.8</angular.version>
         <jquery.version>2.1.4</jquery.version>
+        <bootstrap.version>3.3.7</bootstrap.version>
     </properties>
 
     <dependencies>
@@ -30,14 +31,23 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-joda</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.webjars.bower</groupId>
-            <artifactId>skeleton-css</artifactId>
-            <version>${skeleton.version}</version>
+            <artifactId>angular</artifactId>
+            <version>${angular.version}</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
             <version>${jquery.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>${bootstrap.version}</version>
         </dependency>
     </dependencies>
 

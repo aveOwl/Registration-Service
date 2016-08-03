@@ -1,15 +1,40 @@
-.has-error {
-    color: #a94442 !important;
+.error-body {
+    background-color: #f1f1f1;
+    margin: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.hidden {
-    display: none !important;
+.error-container {
+    margin: 50px auto 40px auto;
+    width: 600px;
+    text-align: center;
 }
 
-.field-error {
-    border-color: #a94442 !important;
+.error-h1 {
+    width: 800px;
+    position: relative;
+    left: -100px;
+    letter-spacing: -1px;
+    line-height: 60px;
+    font-size: 60px;
+    font-weight: 100;
+    margin: 0px 0 50px 0;
+    text-shadow: 0 1px 0 #fff;
 }
 
-.field-valid {
-    border-color: #33C3F0 !important;
+.account-p {
+    line-height: 1.6;
+    font-size: 18px;
+}
+
+.error-p {
+    color: rgba(0, 0, 0, 0.5);
+    margin: 20px 0;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.logo {
+    display: inline-block;
+    margin-top: 20px;
 }

@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8"/>
-    <title>Error</title>
+    <title>Registration Service</title>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" th:href="@{/webjars/skeleton-css/2.0.4/css/skeleton.css}"
-          href="webjars/skeleton-css/2.0.4/css/skeleton.css" />
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/dist/css/bootstrap.min.css}"
+          href="webjars/bootstrap/3.3.7/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" th:href="@{/css/style.css}" href="/static/css/style.css" />
 </head>
-<body>
 
-<div class="container">
-    <div class="one-half column">
-        <h1>Error</h1>
-    </div>
+<body class="error-body">
+<div class="error-container">
+
+    <h1 class="error-h1" th:text="${code}"></h1>
+
+    <p class="error-p">
+        <strong th:text="${reason}"></strong>
+    </p>
+
+    <p class="error-p" th:text="${description}"></p>
+
 </div>
-<hr />
 
-<div class="container">
-    <h3 th:text="${errorMsg}"></h3>
-</div>
-
-<hr/>
 <div th:replace="fragments/footer :: footer"></div>
 </body>
+
 </html>

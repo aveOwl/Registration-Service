@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.Base64Utils;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
@@ -35,9 +36,6 @@ public class UserServiceTest {
     private MailService mailService;
 
     @MockBean
-    private HttpServletRequest request;
-
-    @MockBean
     private UserRepository userRepository;
 
     private static final String EMAIL = "email@domain.com";
@@ -48,7 +46,7 @@ public class UserServiceTest {
     @Before
     public void setUp() throws Exception {
         user = new User(EMAIL, PASSWORD);
-        doNothing().when(mailService).sendMail(user, request);
+        doNothing().when(mailService).sendMail(user);
     }
 
     @After
@@ -107,11 +105,14 @@ public class UserServiceTest {
 
     @Test
     public void shouldConfirmUser() throws Exception {
+        final String code = Base64Utils.encodeToString(EMAIL.getBytes());
+
         given(userRepository.findByEmail(EMAIL))
                 .willReturn(user);
+
         user.setId(99L);
 
-        userService.confirm(EMAIL);
+        userService.confirm(code);
 
         verify(userRepository, atLeastOnce()).saveAndFlush(user);
     }
@@ -121,7 +122,7 @@ public class UserServiceTest {
         given(userRepository.findByEmail(EMAIL))
                 .willReturn(null);
 
-        userService.confirm(EMAIL);
+        userService.confirm("invalid code");
 
         verify(userRepository, never()).saveAndFlush(user);
     }

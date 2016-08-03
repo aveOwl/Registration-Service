@@ -31,6 +31,12 @@ public class EmailBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(EmailBuilder.class);
 
     /**
+     * Request URL.
+     */
+    @Value("${request.url}")
+    public String requestUrl;
+
+    /**
      * Confirmation URL.
      */
     private static final String CONFIRM = "/confirm/";
@@ -97,8 +103,8 @@ public class EmailBuilder {
      * @param request user's registration request.
      * @return conformation link which contains user specific data.
      */
-    private String getConfirmUrl(final User user, final HttpServletRequest request) {
-        return request.getRequestURL() + CONFIRM +
+    private String getConfirmUrl(final User user) {
+        return requestUrl + CONFIRM +
                 Base64Utils.encodeToString((user.getEmail() + ":" + user.getPassword()).getBytes());
     }
 
@@ -107,20 +113,19 @@ public class EmailBuilder {
      * Populates email body model and converts
      * template with model into String.
      * @param user user who's information is being processed.
-     * @param request user's registration request.
      * @return String containing email template with populated model, or
      * <code>null</code> if exception occurred.
      */
-    private String getEmailText(final User user, final HttpServletRequest request) {
+    private String getEmailText(final User user) {
         try {
             Map<String, Object> model = new HashMap<>();
 
             model.put("email", user.getEmail());
             model.put("password", getStarsPassword(user));
-            model.put("confirmUrl", getConfirmUrl(user, request));
+            model.put("confirmUrl", getConfirmUrl(user));
 
             LOG.debug("Constructing model: {email={}, password={}, confirmUrl={}}",
-                    user.getEmail(), getStarsPassword(user), getConfirmUrl(user, request));
+                    user.getEmail(), getStarsPassword(user), getConfirmUrl(user));
 
             final String text = FreeMarkerTemplateUtils.processTemplateIntoString(
                     freeMarkerConfigurer
@@ -139,14 +144,13 @@ public class EmailBuilder {
      * message subject, recipient email address, using <code>getEmailText</code>
      * method fetches email text body and adjusts needed resources.
      * @param user user who'm email is being created.
-     * @param request user's registration request.
      * @return fully composed conformation email message.
      */
-    public MimeMessage createEmail(final User user, final HttpServletRequest request) {
+    public MimeMessage createEmail(final User user) {
         try {
             final MimeMessage message = this.mailSender.createMimeMessage();
             final MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            final String emailText = getEmailText(user, request);
+            final String emailText = getEmailText(user);
 
             helper.setFrom(sender);
             helper.setSubject(subject);
@@ -177,16 +181,14 @@ public class EmailBuilder {
     /**
      * Sends the email created by <code>createEmail</code> method.
      * @param user who'm email is sent.
-     * @param request user's registration request.
      */
-    public void sendEmail(final User user, final HttpServletRequest request) {
+    public void sendEmail(final User user) {
         try {
-            this.mailSender.send(createEmail(user, request));
+            this.mailSender.send(createEmail(user));
         } catch (MailAuthenticationException e) {
             LOG.error("Authentication failure: {}", e.getMessage());
         } catch (MailSendException e) {
             LOG.error("Error while sending the message: {}", e.getMessage());
         }
-        LOG.info("Message sent.");
     }
 }

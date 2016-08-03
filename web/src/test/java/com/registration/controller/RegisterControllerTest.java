@@ -1,5 +1,8 @@
 package com.registration.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.registration.model.User;
 import com.registration.service.MailService;
 import com.registration.service.UserService;
@@ -13,9 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.util.Base64Utils;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,8 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
-import static org.mockito.BDDMockito.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest
@@ -40,10 +38,9 @@ public class RegisterControllerTest {
     @MockBean
     private MailService mailService;
 
-    @MockBean
-    private HttpServletRequest request;
-
     private User user;
+
+    private String inputJson;
 
     private static final String VALID_EMAIL = "redowlave@gmail.com";
 
@@ -55,11 +52,10 @@ public class RegisterControllerTest {
 
     private static final String REGISTRATION = "/registration";
 
-    private static final String CONFIRM = REGISTRATION + "/confirm/";
-
     @Before
     public void setUp() throws Exception {
-        user = new User(VALID_EMAIL, VALID_PASSWORD);
+        user = new User();
+        inputJson = mapToJson(user);
     }
 
     @After
@@ -83,54 +79,78 @@ public class RegisterControllerTest {
     }
 
     @Test
-    public void verifyInvalidInput() throws Exception {
-        mvc.perform(post(REGISTRATION)
-                .param("email", VALID_EMAIL)
-                .param("password", INVALID_PASSWORD))
-                .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.invalidEmail", is(false)))
-                .andExpect(jsonPath("$.invalidPassword", is(true)));
+    public void verifyInvalidEmailValidPassword() throws Exception {
+        user.setEmail(INVALID_EMAIL);
+        user.setPassword(VALID_PASSWORD);
+
+        inputJson = mapToJson(user);
 
         mvc.perform(post(REGISTRATION)
-                .param("email", INVALID_EMAIL)
-                .param("password", VALID_PASSWORD))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(inputJson))
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(true)))
                 .andExpect(jsonPath("$.invalidPassword", is(false)));
+    }
+
+    @Test
+    public void verifyValidEmailInvalidPassword() throws Exception {
+        user.setEmail(VALID_EMAIL);
+        user.setPassword(INVALID_PASSWORD);
+
+        inputJson = mapToJson(user);
 
         mvc.perform(post(REGISTRATION)
-                .param("email", INVALID_EMAIL)
-                .param("password", INVALID_PASSWORD))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(inputJson))
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.invalidEmail", is(false)))
+                .andExpect(jsonPath("$.invalidPassword", is(true)));
+    }
+
+    @Test
+    public void verifyInvalidEmailInvalidPassword() throws Exception {
+        user.setEmail(INVALID_EMAIL);
+        user.setPassword(INVALID_PASSWORD);
+
+        inputJson = mapToJson(user);
+
+        mvc.perform(post(REGISTRATION)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(inputJson))
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(true)))
                 .andExpect(jsonPath("$.invalidPassword", is(true)));
     }
 
     @Test
-    public void verifyValidInput() throws Exception {
+    public void verifyValidEmailValidPassword() throws Exception {
+        user.setEmail(VALID_EMAIL);
+        user.setPassword(VALID_PASSWORD);
+
+        inputJson = mapToJson(user);
+
         mvc.perform(post(REGISTRATION)
-                .param("email", VALID_EMAIL)
-                .param("password", VALID_PASSWORD))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(inputJson))
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.invalidEmail", is(false)))
                 .andExpect(jsonPath("$.invalidPassword", is(false)));
     }
 
     @Test
-    public void shouldProcessConfirmation() throws Exception {
-        String encodedData =
-                Base64Utils.encodeToString((user.getEmail() + ":" + user.getPassword()).getBytes());
-
-        doNothing().when(userService).confirm(VALID_EMAIL);
-
-        mvc.perform(get(CONFIRM + encodedData))
-                    .andExpect(status().isFound())
-                    .andExpect(redirectedUrl("/success"));
-    }
-
-    @Test
     public void shouldRedirectToSuccessPage() throws Exception {
         mvc.perform(get("/success"))
                 .andExpect(view().name("success"));
+    }
+
+    private String mapToJson(final Object obj) throws JsonProcessingException {
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JodaModule());
+        return mapper.writeValueAsString(obj);
     }
 }

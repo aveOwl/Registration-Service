@@ -4,15 +4,19 @@ import com.registration.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.persistence.NoResultException;
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class ConfirmController {
@@ -29,12 +33,9 @@ public class ConfirmController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/registration/confirm/{encrypt:.*}", method = RequestMethod.GET)
-    public String confirm(@PathVariable final String encrypt) {
-        final String[] data = new String(Base64Utils.decodeFromString(encrypt)).split(":");
-        LOG.info("Decrypted email: {}", data[0]);
-
-        userService.confirm(data[0]);
+    @RequestMapping(value = "/registration/confirm/{code:.*}", method = RequestMethod.GET)
+    public String confirm(@PathVariable final String code) {
+        userService.confirm(code);
 
         return "redirect:/success";
     }
@@ -53,10 +54,18 @@ public class ConfirmController {
      * a HTTP status code 400, bad request.
      */
     @ExceptionHandler(NoResultException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ModelAndView handleNoResultException(final NoResultException e) {
-        LOG.error("NoResultException: ", e.getMessage());
-        ModelAndView model = new ModelAndView("error");
-        model.addObject("errorMsg", e.getMessage());
+        LOG.error(e.getMessage());
+        ModelAndView model = new ModelAndView();
+
+        final String desc = "There is no content available. " + e.getMessage();
+
+        model.addObject("code", HttpStatus.BAD_REQUEST.value());
+        model.addObject("reason", HttpStatus.BAD_REQUEST.getReasonPhrase());
+        model.addObject("description", desc);
+        model.setViewName("error");
+
         return model;
     }
 }

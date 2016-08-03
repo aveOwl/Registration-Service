@@ -7,8 +7,12 @@ import com.registration.util.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -37,6 +41,11 @@ public class RegisterController {
         this.mailService = mailService;
     }
 
+    @ModelAttribute
+    public User getUser() {
+        return new User();
+    }
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String redirect() {
         LOG.info("Redirecting to home page...");
@@ -44,21 +53,23 @@ public class RegisterController {
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
-    public ModelAndView home(User user) {
+    public ModelAndView home() {
         LOG.info("Rendering home page...");
         return new ModelAndView("index");
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     @ResponseBody
-    public ValidationResult register(final @Valid User user,
-                                     final BindingResult bindingResult,
-                                     final HttpServletRequest request) {
+    public ValidationResult register(final @Valid @RequestBody User user,
+                                     final BindingResult bindingResult) {
         LOG.info("Attempting user registration...");
 
+        LOG.debug("User from request: {}", user);
+
         if (!bindingResult.hasErrors()) {
+            LOG.info("User: {} verified", user);
             userService.create(user);
-            mailService.sendMail(user, request);
+            mailService.sendMail(user);
         } else {
             LOG.error("User verification failed: {}", bindingResult.getFieldErrors());
         }
