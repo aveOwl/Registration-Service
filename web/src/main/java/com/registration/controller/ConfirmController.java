@@ -19,7 +19,7 @@ import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-public class ConfirmController {
+public class ConfirmController extends BaseController {
 
     /**
      * Logging system for this class.
@@ -35,6 +35,8 @@ public class ConfirmController {
 
     @RequestMapping(value = "/registration/confirm/{code:.*}", method = RequestMethod.GET)
     public String confirm(@PathVariable final String code) {
+        LOG.info("Attempting user confirmation...");
+
         userService.confirm(code);
 
         return "redirect:/success";
@@ -42,30 +44,7 @@ public class ConfirmController {
 
     @RequestMapping(value = "/success", method = RequestMethod.GET)
     public String confirm() {
+        LOG.info("Rendering success page...");
         return "success";
-    }
-
-    /**
-     * Handles NoResultException. Renders error page with the Exception
-     * detail and a HTTP status code 400, bad request.
-     *
-     * @param e A NoResultException instance.
-     * @return An Error page containing a the Exception message and
-     * a HTTP status code 400, bad request.
-     */
-    @ExceptionHandler(NoResultException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ModelAndView handleNoResultException(final NoResultException e) {
-        LOG.error(e.getMessage());
-        ModelAndView model = new ModelAndView();
-
-        final String desc = "There is no content available. " + e.getMessage();
-
-        model.addObject("code", HttpStatus.BAD_REQUEST.value());
-        model.addObject("reason", HttpStatus.BAD_REQUEST.getReasonPhrase());
-        model.addObject("description", desc);
-        model.setViewName("error");
-
-        return model;
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailAuthenticationException;
+import org.springframework.mail.MailPreparationException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -100,11 +101,10 @@ public class EmailBuilder {
      * unique string with encrypted user data associated with
      * this specific user.
      * @param user user for whom unique conformation link is being created.
-     * @param request user's registration request.
      * @return conformation link which contains user specific data.
      */
-    private String getConfirmUrl(final User user) {
-        return requestUrl + CONFIRM +
+    private String getConfirmUrl(final User user, final HttpServletRequest request) {
+        return request.getRequestURL().toString() + CONFIRM +
                 Base64Utils.encodeToString((user.getEmail() + ":" + user.getPassword()).getBytes());
     }
 
@@ -113,19 +113,19 @@ public class EmailBuilder {
      * Populates email body model and converts
      * template with model into String.
      * @param user user who's information is being processed.
-     * @return String containing email template with populated model, or
-     * <code>null</code> if exception occurred.
+     * @return String containing email template with populated model.
+     * @throws MailPreparationException if error occurred.
      */
-    private String getEmailText(final User user) {
+    private String getEmailText(final User user, final HttpServletRequest request) {
         try {
             Map<String, Object> model = new HashMap<>();
 
             model.put("email", user.getEmail());
             model.put("password", getStarsPassword(user));
-            model.put("confirmUrl", getConfirmUrl(user));
+            model.put("confirmUrl", getConfirmUrl(user, request));
 
             LOG.debug("Constructing model: {email={}, password={}, confirmUrl={}}",
-                    user.getEmail(), getStarsPassword(user), getConfirmUrl(user));
+                    user.getEmail(), getStarsPassword(user), getConfirmUrl(user, request));
 
             final String text = FreeMarkerTemplateUtils.processTemplateIntoString(
                     freeMarkerConfigurer
@@ -134,9 +134,8 @@ public class EmailBuilder {
             return text;
         } catch (Exception e) {
             LOG.error("Error while composing email text: {}", e.getMessage());
-            e.printStackTrace();
+            throw new MailPreparationException("Failed to compose email text.");
         }
-        return null;
     }
 
     /**
@@ -145,21 +144,18 @@ public class EmailBuilder {
      * method fetches email text body and adjusts needed resources.
      * @param user user who'm email is being created.
      * @return fully composed conformation email message.
+     * @throws MailPreparationException if error occurred.
      */
-    public MimeMessage createEmail(final User user) {
+    private MimeMessage createEmail(final User user, final HttpServletRequest request) {
         try {
             final MimeMessage message = this.mailSender.createMimeMessage();
             final MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            final String emailText = getEmailText(user);
+            final String emailText = getEmailText(user, request);
 
             helper.setFrom(sender);
             helper.setSubject(subject);
             helper.setTo(user.getEmail());
-            if (emailText != null) {
-                helper.setText(emailText, true);
-            } else {
-                throw new NullArgumentException("EmailText cannot be null.");
-            }
+            helper.setText(emailText, true);
 
             LOG.debug("Constructing email: " +
                             "{Sender email address={}, Message subject={}, Recipient email address={}}",
@@ -173,22 +169,15 @@ public class EmailBuilder {
             return message;
         } catch (Exception e) {
             LOG.error("Error while creating email: {}", e.getMessage());
-            e.printStackTrace();
+            throw new MailPreparationException("Failed to construct email.");
         }
-        return null;
     }
 
     /**
      * Sends the email created by <code>createEmail</code> method.
      * @param user who'm email is sent.
      */
-    public void sendEmail(final User user) {
-        try {
-            this.mailSender.send(createEmail(user));
-        } catch (MailAuthenticationException e) {
-            LOG.error("Authentication failure: {}", e.getMessage());
-        } catch (MailSendException e) {
-            LOG.error("Error while sending the message: {}", e.getMessage());
-        }
+    public void sendEmail(final User user, final HttpServletRequest request) {
+        this.mailSender.send(createEmail(user, request));
     }
 }

@@ -18,7 +18,11 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 
+import static com.registration.Points.VALID_EMAIL;
+import static com.registration.Points.VALID_PASSWORD;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.atLeastOnce;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.never;
@@ -38,15 +42,15 @@ public class UserServiceTest {
     @MockBean
     private UserRepository userRepository;
 
-    private static final String EMAIL = "email@domain.com";
-    private static final String PASSWORD = "password";
-
+    @MockBean
+    private HttpServletRequest request;
+    
     private User user;
 
     @Before
     public void setUp() throws Exception {
-        user = new User(EMAIL, PASSWORD);
-        doNothing().when(mailService).sendMail(user);
+        user = new User(VALID_EMAIL, VALID_PASSWORD);
+        doNothing().when(mailService).sendMail(user, request);
     }
 
     @After
@@ -56,32 +60,30 @@ public class UserServiceTest {
 
     @Test
     public void shouldFindUserByEmail() throws Exception {
-        given(userRepository.findByEmail(EMAIL))
+        given(userRepository.findByEmail(VALID_EMAIL))
                 .willReturn(user);
 
-        User user = userService.findByEmail(EMAIL);
+        User user = userService.findByEmail(VALID_EMAIL);
 
-        assertEquals(user.getPassword(), PASSWORD);
+        assertEquals(user.getPassword(), VALID_PASSWORD);
     }
 
     @Test
     public void shouldCreateUser() throws Exception {
-        given(userRepository.findByEmail(EMAIL))
-                .willReturn(null);
-
+        user.setId(null);
+        
         userService.create(user);
 
-        verify(userRepository, atLeastOnce()).saveAndFlush(user);
+        verify(userRepository, atLeastOnce()).save(user);
     }
 
     @Test(expected = EntityExistsException.class)
-    public void shouldFailToCreateWithExistingEmail() throws Exception {
-        given(userRepository.findByEmail(EMAIL))
-                .willReturn(user);
+    public void shouldFailToCreateUser() throws Exception {
+        user.setId(99L);
 
         userService.create(user);
 
-        verify(userRepository, never()).saveAndFlush(user);
+        verify(userRepository, never()).save(user);
     }
 
     @Test
@@ -90,7 +92,7 @@ public class UserServiceTest {
 
         userService.update(user);
 
-        verify(userRepository, atLeastOnce()).saveAndFlush(user);
+        verify(userRepository, atLeastOnce()).save(user);
     }
 
     @Test(expected = EntityNotFoundException.class)
@@ -99,32 +101,34 @@ public class UserServiceTest {
 
         userService.update(user);
 
-        verify(userRepository, never()).saveAndFlush(user);
+        verify(userRepository, never()).save(user);
     }
 
 
     @Test
     public void shouldConfirmUser() throws Exception {
-        final String code = Base64Utils.encodeToString(EMAIL.getBytes());
+        final String code = Base64Utils.encodeToString(VALID_EMAIL.getBytes());
 
-        given(userRepository.findByEmail(EMAIL))
+        given(userRepository.findByEmail(VALID_EMAIL))
                 .willReturn(user);
 
         user.setId(99L);
 
         userService.confirm(code);
 
-        verify(userRepository, atLeastOnce()).saveAndFlush(user);
+        verify(userRepository, atLeastOnce()).save(user);
+        assertThat(user.isConfirmed(), is(true));
     }
 
     @Test(expected = NoResultException.class)
-    public void shouldFailToConfirmInvalidLink() throws Exception {
-        given(userRepository.findByEmail(EMAIL))
+    public void shouldFailToConfirmUser() throws Exception {
+        given(userRepository.findByEmail(VALID_EMAIL))
                 .willReturn(null);
 
         userService.confirm("invalid code");
 
-        verify(userRepository, never()).saveAndFlush(user);
+        assertThat(user.isConfirmed(), is(false));
+        verify(userRepository, never()).save(user);
     }
 
     @Test(expected = IllegalArgumentException.class)

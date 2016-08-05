@@ -32,23 +32,26 @@ public class UserServiceImpl implements UserService {
     public User create(final User user) {
         Assert.notNull(user);
 
-        final String email = user.getEmail();
-
-        if (findByEmail(email) != null) {
-            LOG.error("Attempt to create a User object, but email was taken.");
-            throw new EntityExistsException("Email is taken.");
+        if (user.getId() != null) {
+            LOG.error("Attempted to create a User object, but id attribute was not null.");
+            throw new EntityExistsException(
+                    "Cannot create new User with supplied id. The id attribute must be null.");
         }
 
-        LOG.debug("Creating user: {}", user);
-        return userRepository.saveAndFlush(user);
+        final User savedUser = userRepository.save(user);
+
+        LOG.debug("Persisted user entity: {}", savedUser);
+        return savedUser;
     }
 
     @Override
     public User findByEmail(final String email) {
         Assert.notNull(email);
 
-        LOG.debug("Fetching user entity by email: {}", email);
-        return userRepository.findByEmail(email);
+        final User user = userRepository.findByEmail(email);
+
+        LOG.debug("User entity: {} fetched by email: {}", user, email);
+        return user;
     }
 
     @Override
@@ -56,12 +59,14 @@ public class UserServiceImpl implements UserService {
         Assert.notNull(user);
 
         if (user.getId() == null) {
-            LOG.error("Can't preform update id cannot be null: {}", user);
-            throw new EntityNotFoundException("No such user in the database.");
+            LOG.error("Attempted to update a User object, but id attribute was null.");
+            throw new EntityNotFoundException("Cannot preform update. The id attribute cannot be null.");
         }
 
-        LOG.debug("Updating user: {}", user);
-        return userRepository.saveAndFlush(user);
+        final User updatedUser = userRepository.save(user);
+
+        LOG.info("Updated user entity: {}", updatedUser);
+        return updatedUser;
     }
 
     @Override
@@ -70,7 +75,7 @@ public class UserServiceImpl implements UserService {
             byte[] decodedData = Base64Utils.decodeFromString(code);
 
             // array contains user email and password
-            // {'email', ':', 'password'}
+            // {'email', 'password'}
             final String[] data = new String(decodedData).split(":");
 
             final User user = findByEmail(data[0]);

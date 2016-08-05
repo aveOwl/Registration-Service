@@ -28,11 +28,11 @@ public class MailServiceImpl implements MailService {
 
     @Override
     @Async
-    public void sendMail(final User user) {
+    public void sendMail(final User user, final HttpServletRequest request) {
         Assert.notNull(user);
 
-        LOG.debug("Sending email for user: ", user);
-        emailBuilder.sendEmail(user);
+        LOG.debug("Sending email to: ", user.getEmail());
+        emailBuilder.sendEmail(user, request);
         LOG.info("Message sent.");
     }
 }

@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.Assert;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -13,20 +12,14 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
 
-import static com.registration.model.User.*;
+import static com.registration.Points.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 public class UserTest {
 
     private User user = null;
-    private static final String VALID_EMAIL = "valid@domain.com";
-    private static final String INVALID_EMAIL = "invalid!domain.com";
-    private static final String VALID_PASSWORD = "pass!wo2r1";
-    private static final String INVALID_PASSWORD = "password";
 
     @Before
     public void setUp() throws Exception {
@@ -92,16 +85,15 @@ public class UserTest {
 
     @Test
     public void shouldCompareTwoUserAsNotEquals() throws Exception {
-        User valid1 = new User(VALID_EMAIL, VALID_PASSWORD);
-        User valid2 = new User(VALID_EMAIL, VALID_PASSWORD);
-        User invalid = new User(VALID_EMAIL, INVALID_PASSWORD);
+        User valid = new User(VALID_EMAIL, VALID_PASSWORD);
+        User invalid = new User(INVALID_EMAIL, INVALID_PASSWORD);
 
-        assertThat(valid1.getEmail().equals(invalid.getEmail()), is(true));
-        assertThat(valid1.getPassword().equals(invalid.getPassword()), is(false));
-        assertThat(valid1.equals(invalid), is(false));
+        assertThat(valid.equals(invalid), is(false));
 
-        valid1.setConfirmed(true);
-        assertThat(valid1.equals(valid2), is(false));
+        valid.setConfirmed(true);
+        invalid.setConfirmed(true);
+
+        assertThat(valid.equals(invalid), is(false));
     }
 
     @Test
@@ -110,8 +102,10 @@ public class UserTest {
         User valid2 = new User(VALID_EMAIL, VALID_PASSWORD);
 
         assertThat(valid1.equals(valid2), is(true));
-        assertThat(valid1.getEmail().equals(valid2.getEmail()), is(true));
-        assertThat(valid1.getPassword().equals(valid2.getPassword()), is(true));
+
+        valid1.setConfirmed(true);
+        valid2.setConfirmed(true);
+
         assertThat(valid1.equals(valid2), is(true));
     }
 }

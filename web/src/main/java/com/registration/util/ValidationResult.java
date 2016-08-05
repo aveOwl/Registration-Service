@@ -1,7 +1,9 @@
 package com.registration.util;
 
 import com.registration.model.User;
+import com.registration.service.UserService;
 import org.hibernate.validator.constraints.Email;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -12,6 +14,7 @@ import javax.validation.constraints.Pattern;
  * to {@link User} entity form validation.
  */
 public class ValidationResult {
+
     /**
      * If set to true user validation
      * was successful.
@@ -53,6 +56,7 @@ public class ValidationResult {
      */
     public ValidationResult(final BindingResult bindingResult) {
         success = !bindingResult.hasFieldErrors();
+
 
         invalidEmail = bindingResult.hasFieldErrors("email");
         invalidPassword = bindingResult.hasFieldErrors("password");

@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Controller
-public class RegisterController {
+public class RegisterController extends BaseController {
     /**
      * Logging system for this class.
      */
@@ -61,15 +62,18 @@ public class RegisterController {
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     @ResponseBody
     public ValidationResult register(final @Valid @RequestBody User user,
-                                     final BindingResult bindingResult) {
+                                     final BindingResult bindingResult,
+                                     final HttpServletRequest request) {
         LOG.info("Attempting user registration...");
 
-        LOG.debug("User from request: {}", user);
+        if (!bindingResult.hasErrors() && userService.findByEmail(user.getEmail()) != null) {
+            bindingResult.addError(new FieldError("user", "email", "Email is taken."));
+        }
 
         if (!bindingResult.hasErrors()) {
             LOG.info("User: {} verified", user);
             userService.create(user);
-            mailService.sendMail(user);
+            mailService.sendMail(user, request);
         } else {
             LOG.error("User verification failed: {}", bindingResult.getFieldErrors());
         }

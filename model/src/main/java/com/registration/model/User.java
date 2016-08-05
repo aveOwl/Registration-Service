@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Pattern;
 
+import static com.registration.Points.*;
+
 /**
  * User entity class.
  */
@@ -21,11 +23,6 @@ public class User {
      * Regular Expression for password verification.
      */
     private static final String PASSWORD_REGEXP = "((?=(.*\\d){2})(?=.*[!]).{6,20})";
-
-    static final String EMPTY_EMAIL_MSG = "Input your email address.";
-    static final String INVALID_EMAIL_MSG = "Email is invalid.";
-    static final String EMPTY_PASSWORD_MSG = "Input your password.";
-    static final String INVALID_PASSWORD_MSG = "Password is invalid.";
 
     @Id
     @GeneratedValue
@@ -120,15 +117,18 @@ public class User {
     @Override
     public int hashCode() {
         int hash = 17;
-        hash = 31*hash + email.hashCode();
-        hash = 31*hash + password.hashCode();
+        if (email != null && password != null) {
+            hash = 31 * hash + email.hashCode();
+            hash = 31 * hash + password.hashCode();
+        }
         return hash;
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "email='" + email + '\'' +
+                "id=" + id +
+                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", isConfirmed=" + isConfirmed +
                 '}';

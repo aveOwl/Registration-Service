@@ -28,6 +28,9 @@ public class MailServiceTest {
     @MockBean
     private EmailBuilder emailBuilder;
 
+    @MockBean
+    private HttpServletRequest request;
+
     private User user;
 
     @Before
@@ -42,15 +45,15 @@ public class MailServiceTest {
 
     @Test
     public void shouldSendWithoutError() throws Exception {
-        mailService.sendMail(user);
+        mailService.sendMail(user, request);
 
-        verify(emailBuilder, atLeastOnce()).sendEmail(user);
+        verify(emailBuilder, atLeastOnce()).sendEmail(user, request);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowExceptionOnNullUser() throws Exception {
-        mailService.sendMail(null);
+        mailService.sendMail(null, request);
 
-        verify(emailBuilder, never()).sendEmail(null);
+        verify(emailBuilder, never()).sendEmail(null, request);
     }
 }
