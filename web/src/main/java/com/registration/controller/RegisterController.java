@@ -62,8 +62,7 @@ public class RegisterController extends BaseController {
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     @ResponseBody
     public ValidationResult register(final @Valid @RequestBody User user,
-                                     final BindingResult bindingResult,
-                                     final HttpServletRequest request) {
+                                     final BindingResult bindingResult) {
         LOG.info("Attempting user registration...");
 
         if (!bindingResult.hasErrors() && userService.findByEmail(user.getEmail()) != null) {
@@ -73,7 +72,7 @@ public class RegisterController extends BaseController {
         if (!bindingResult.hasErrors()) {
             LOG.info("User: {} verified", user);
             userService.create(user);
-            mailService.sendMail(user, request);
+            mailService.sendMail(user);
         } else {
             LOG.error("User verification failed: {}", bindingResult.getFieldErrors());
         }

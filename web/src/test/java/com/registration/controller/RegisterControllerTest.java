@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.registration.model.User;
 import com.registration.service.MailService;
 import com.registration.service.UserService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,9 +39,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(RegisterController.class)
 public class RegisterControllerTest {
+    /**
+     * URI to registration page.
+     */
+    private static final String REGISTRATION_URI = "/registration";
 
+    /**
+     * A {@link MockMvc} instance.
+     */
     @Autowired
-    protected MockMvc mvc;
+    private MockMvc mvc;
 
     /**
      * A mocked {@link UserService}.
@@ -54,35 +62,48 @@ public class RegisterControllerTest {
     @MockBean
     private MailService mailService;
 
-    private HttpServletRequest request;
-
     private String inputJson;
 
     private User user;
 
-    private static final String RESOURCE_URI = "/registration";
-
     @Before
     public void setUp() throws Exception {
-//        this.mvc = MockMvcBuilders.standaloneSetup(new RegisterController()).build();
         user = new User(VALID_EMAIL, VALID_PASSWORD);
     }
 
+    @After
+    public void tearDown() throws Exception {
+        user = null;
+    }
+
+    /**
+     * Should redirect from root path onto registration page.
+     * @throws Exception on error.
+     */
     @Test
     public void shouldRedirectToHomePage() throws Exception {
         this.mvc.perform(get("/"))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl(RESOURCE_URI));
+                .andExpect(redirectedUrl(REGISTRATION_URI));
     }
 
+    /**
+     * Should display home page.
+     * @throws Exception on error.
+     */
     @Test
     public void shouldDisplayDefaultHomePage() throws Exception {
-        this.mvc.perform(get(RESOURCE_URI).accept(MediaType.TEXT_HTML_VALUE))
+        this.mvc.perform(get(REGISTRATION_URI).accept(MediaType.TEXT_HTML_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(model().hasNoErrors())
                 .andExpect(view().name("index"));
     }
 
+    /**
+     * Should refuse to attempt user registration if
+     * provided email already exists.
+     * @throws Exception on error.
+     */
     @Test
     public void shouldNotRegisterUserOnDuplicateEmail() throws Exception {
         given(userService.findByEmail(VALID_EMAIL))
@@ -93,7 +114,7 @@ public class RegisterControllerTest {
 
         inputJson = mapToJson(user);
 
-        mvc.perform(post(RESOURCE_URI)
+        this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
@@ -104,9 +125,14 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
         verify(userService, never()).create(user);
-        verify(mailService, never()).sendMail(eq(user), any());
+        verify(mailService, never()).sendMail(user);
     }
 
+    /**
+     * Should refuse to attempt user registration if
+     * provided email is invalid according to {@link User} constraints.
+     * @throws Exception on error.
+     */
     @Test
     public void shouldNotRegisterUserOnInvalidEmail() throws Exception {
         user.setEmail(INVALID_EMAIL);
@@ -114,7 +140,7 @@ public class RegisterControllerTest {
 
         inputJson = mapToJson(user);
 
-        mvc.perform(post(RESOURCE_URI)
+        this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
@@ -125,9 +151,14 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
         verify(userService, never()).create(user);
-        verify(mailService, never()).sendMail(eq(user), any());
+        verify(mailService, never()).sendMail(user);
     }
 
+    /**
+     * Should refuse to attempt user registration if
+     * provided password is invalid according to {@link User} constraints.
+     * @throws Exception on error.
+     */
     @Test
     public void shouldNotRegisterUserOnInvalidPassword() throws Exception {
         user.setEmail(VALID_EMAIL);
@@ -135,7 +166,7 @@ public class RegisterControllerTest {
 
         inputJson = mapToJson(user);
 
-        mvc.perform(post(RESOURCE_URI)
+        this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
@@ -146,9 +177,14 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", is(INVALID_PASSWORD_MSG)));
 
         verify(userService, never()).create(user);
-        verify(mailService, never()).sendMail(eq(user), any());
+        verify(mailService, never()).sendMail(user);
     }
 
+    /**
+     * Should refuse to attempt user registration if both
+     * provided password and email is invalid according to {@link User} constraints.
+     * @throws Exception on error.
+     */
     @Test
     public void shouldNotRegisterUserOnInvalidPasswordAndInvalidEmail() throws Exception {
         user.setEmail(INVALID_EMAIL);
@@ -156,7 +192,7 @@ public class RegisterControllerTest {
 
         inputJson = mapToJson(user);
 
-        mvc.perform(post(RESOURCE_URI)
+        this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
@@ -167,9 +203,14 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", is(INVALID_PASSWORD_MSG)));
 
         verify(userService, never()).create(user);
-        verify(mailService, never()).sendMail(eq(user), any());
+        verify(mailService, never()).sendMail(user);
     }
 
+    /**
+     * Should attempt user registration if both provided password
+     * and email is valid according to {@link User} constraints.
+     * @throws Exception on error.
+     */
     @Test
     public void shouldRegisterUserOnValidInput() throws Exception {
         user.setEmail(VALID_EMAIL);
@@ -177,7 +218,7 @@ public class RegisterControllerTest {
 
         inputJson = mapToJson(user);
 
-        mvc.perform(post(RESOURCE_URI)
+        this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
@@ -188,7 +229,7 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
         verify(userService, atLeastOnce()).create(user);
-        verify(mailService, atLeastOnce()).sendMail(eq(user), any());
+        verify(mailService, atLeastOnce()).sendMail(user);
     }
 
     /**

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -21,7 +22,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(ConfirmController.class)
 public class ConfirmControllerTest {
+    /**
+     * URI to confirmation page.
+     */
+    private static final String RESOURCE_URI = "/registration/confirm";
 
+    /**
+     * A {@link MockMvc} instance.
+     */
     @Autowired
     protected MockMvc mvc;
 
@@ -31,8 +39,11 @@ public class ConfirmControllerTest {
     @MockBean
     private UserService userService;
 
-    private static final String RESOURCE_URI = "/registration/confirm";
-
+    /**
+     * Should attempt user confirmation on
+     * valid confirmation link.
+     * @throws Exception on error.
+     */
     @Test
     public void shouldConfirm() throws Exception {
         doNothing().when(userService).confirm("test-hash");
@@ -44,11 +55,15 @@ public class ConfirmControllerTest {
         verify(userService, atLeastOnce()).confirm("test-hash");
     }
 
+    /**
+     * Should render success page.
+     * @throws Exception on error.
+     */
     @Test
-    public void shouldRedirect() throws Exception {
-        this.mvc.perform(get("/success")
-                .contentType(MediaType.TEXT_HTML))
+    public void shouldDisplaySuccessPage() throws Exception {
+        this.mvc.perform(get("/success").accept(MediaType.TEXT_HTML_VALUE))
                 .andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
                 .andExpect(view().name("success"));
     }
 }

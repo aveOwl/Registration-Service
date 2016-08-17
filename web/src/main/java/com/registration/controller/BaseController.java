@@ -3,7 +3,6 @@ package com.registration.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.MailPreparationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,20 +30,6 @@ public class BaseController {
     public ModelAndView handleNoResultException(final NoResultException e) {
         return getErrorModel(HttpStatus.BAD_REQUEST, e);
     }
-
-    /**
-     * Handles root Exception.
-     *
-     * @param e An Exception instance.
-     * @return An Error page containing the Exception message and
-     * a HTTP status code 500, internal server error.
-     */
-    /*@ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ModelAndView handleMailPreparationException(final Exception e) {
-
-        return getErrorModel(HttpStatus.INTERNAL_SERVER_ERROR, e);
-    }*/
 
     /**
      * Creates error model for error page view.
