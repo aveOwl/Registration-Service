@@ -22,5 +22,5 @@ public interface MailService {
      * Constructs and sends confirmation email.
      * @param user user for whom email is build and sent.
      */
-    void sendMail(User user, HttpServletRequest request);
+    void sendMail(User user);
 }

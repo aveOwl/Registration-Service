@@ -53,19 +53,14 @@ public class RegisterController extends BaseController {
         return "redirect:/registration";
     }
 
-    @RequestMapping(value = "/registration", method = RequestMethod.GET)
-    public ModelAndView home() {
-        LOG.info("Rendering home page...");
-        return new ModelAndView("index");
-    }
-
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     @ResponseBody
     public ValidationResult register(final @Valid @RequestBody User user,
                                      final BindingResult bindingResult) {
         LOG.info("Attempting user registration...");
 
-        if (!bindingResult.hasErrors() && userService.findByEmail(user.getEmail()) != null) {
+        if (!bindingResult.hasErrors() &&
+            userService.findByEmail(user.getEmail()) != null) {
             bindingResult.addError(new FieldError("user", "email", "Email is taken."));
         }
 

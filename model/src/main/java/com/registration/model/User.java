@@ -94,7 +94,7 @@ public class User {
         isConfirmed = confirmed;
     }
 
-    /**
+    /**already exists
      * Compares this user to the specified user.
      * @param other the other user.
      * @return true if this user equals other; false otherwise.

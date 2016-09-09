@@ -62,9 +62,9 @@ public class RegisterControllerTest {
     @MockBean
     private MailService mailService;
 
-    private String inputJson;
+    private static String inputJson;
 
-    private User user;
+    private static User user;
 
     @Before
     public void setUp() throws Exception {
@@ -85,18 +85,6 @@ public class RegisterControllerTest {
         this.mvc.perform(get("/"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl(REGISTRATION_URI));
-    }
-
-    /**
-     * Should display home page.
-     * @throws Exception on error.
-     */
-    @Test
-    public void shouldDisplayDefaultHomePage() throws Exception {
-        this.mvc.perform(get(REGISTRATION_URI).accept(MediaType.TEXT_HTML_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(model().hasNoErrors())
-                .andExpect(view().name("index"));
     }
 
     /**

@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
             // {'email', 'password'}
             final String[] data = new String(decodedData).split(":");
 
+            // email
             final User user = findByEmail(data[0]);
 
             if (user != null) {

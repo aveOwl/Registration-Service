@@ -7,6 +7,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -16,18 +18,16 @@ import org.springframework.util.Base64Utils;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
-import javax.servlet.http.HttpServletRequest;
 
 import static com.registration.Points.VALID_EMAIL;
 import static com.registration.Points.VALID_PASSWORD;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.atLeastOnce;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.verify;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.only;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = UserServiceImpl.class)
@@ -37,20 +37,16 @@ public class UserServiceTest {
     private UserService userService;
 
     @MockBean
-    private MailService mailService;
-
-    @MockBean
     private UserRepository userRepository;
 
-    @MockBean
-    private HttpServletRequest request;
-    
-    private User user;
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
+
+    private static User user;
 
     @Before
     public void setUp() throws Exception {
         user = new User(VALID_EMAIL, VALID_PASSWORD);
-        doNothing().when(mailService).sendMail(user, request);
     }
 
     @After
@@ -63,9 +59,12 @@ public class UserServiceTest {
         given(userRepository.findByEmail(VALID_EMAIL))
                 .willReturn(user);
 
-        User user = userService.findByEmail(VALID_EMAIL);
+        final User user = userService.findByEmail(VALID_EMAIL);
 
-        assertEquals(user.getPassword(), VALID_PASSWORD);
+        assertThat("should contain user password",
+                user.getPassword(), is(VALID_PASSWORD));
+        assertThat("should contain user email",
+                user.getEmail(), is(VALID_EMAIL));
     }
 
     @Test
@@ -74,7 +73,12 @@ public class UserServiceTest {
         
         userService.create(user);
 
-        verify(userRepository, atLeastOnce()).save(user);
+        verify(userRepository, only()).save(userCaptor.capture());
+
+        assertThat("should contain corresponding user email",
+                user.getEmail(), is(userCaptor.getValue().getEmail()));
+        assertThat("should contain corresponding user password",
+                user.getPassword(), is(userCaptor.getValue().getPassword()));
     }
 
     @Test(expected = EntityExistsException.class)
@@ -92,7 +96,12 @@ public class UserServiceTest {
 
         userService.update(user);
 
-        verify(userRepository, atLeastOnce()).save(user);
+        verify(userRepository, only()).save(userCaptor.capture());
+
+        assertThat("should contain corresponding user email",
+                user.getEmail(), is(userCaptor.getValue().getEmail()));
+        assertThat("should contain corresponding user password",
+                user.getPassword(), is(userCaptor.getValue().getPassword()));
     }
 
     @Test(expected = EntityNotFoundException.class)
@@ -116,8 +125,14 @@ public class UserServiceTest {
 
         userService.confirm(code);
 
-        verify(userRepository, atLeastOnce()).save(user);
-        assertThat(user.isConfirmed(), is(true));
+        verify(userRepository, atLeastOnce()).save(userCaptor.capture());
+
+        assertThat("user should be confirmed",
+                userCaptor.getValue().isConfirmed(), is(true));
+        assertThat("user should have valid email",
+                userCaptor.getValue().getEmail(), is(VALID_EMAIL));
+        assertThat("user should have valid password",
+                userCaptor.getValue().getPassword(), is(VALID_PASSWORD));
     }
 
     @Test(expected = NoResultException.class)
@@ -127,8 +142,10 @@ public class UserServiceTest {
 
         userService.confirm("invalid code");
 
-        assertThat(user.isConfirmed(), is(false));
         verify(userRepository, never()).save(user);
+
+        assertThat("user should not be confirmed",
+                user.isConfirmed(), is(false));
     }
 
     @Test(expected = IllegalArgumentException.class)

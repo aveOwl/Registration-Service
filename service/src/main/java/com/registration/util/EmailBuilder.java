@@ -40,7 +40,7 @@ public class EmailBuilder {
     /**
      * Confirmation URL.
      */
-    private static final String CONFIRM = "/confirm/";
+    private static final String CONFIRM = "http://localhost:8080/registration/confirm/";
 
     /**
      * Username for the account at the mail host.
@@ -103,9 +103,8 @@ public class EmailBuilder {
      * @param user user for whom unique conformation link is being created.
      * @return conformation link which contains user specific data.
      */
-    private String getConfirmUrl(final User user, final HttpServletRequest request) {
-        return request.getRequestURL().toString() + CONFIRM +
-                Base64Utils.encodeToString((user.getEmail() + ":" + user.getPassword()).getBytes());
+    private String getConfirmUrl(final User user) {
+        return CONFIRM + Base64Utils.encodeToString((user.getEmail() + ":" + user.getPassword()).getBytes());
     }
 
     /**
@@ -116,16 +115,16 @@ public class EmailBuilder {
      * @return String containing email template with populated model.
      * @throws MailPreparationException if error occurred.
      */
-    private String getEmailText(final User user, final HttpServletRequest request) {
+    private String getEmailText(final User user) {
         try {
             Map<String, Object> model = new HashMap<>();
 
             model.put("email", user.getEmail());
             model.put("password", getStarsPassword(user));
-            model.put("confirmUrl", getConfirmUrl(user, request));
+            model.put("confirmUrl", getConfirmUrl(user));
 
             LOG.debug("Constructing model: {email={}, password={}, confirmUrl={}}",
-                    user.getEmail(), getStarsPassword(user), getConfirmUrl(user, request));
+                    user.getEmail(), getStarsPassword(user), getConfirmUrl(user));
 
             final String text = FreeMarkerTemplateUtils.processTemplateIntoString(
                     freeMarkerConfigurer
@@ -146,11 +145,11 @@ public class EmailBuilder {
      * @return fully composed conformation email message.
      * @throws MailPreparationException if error occurred.
      */
-    private MimeMessage createEmail(final User user, final HttpServletRequest request) {
+    private MimeMessage createEmail(final User user) {
         try {
             final MimeMessage message = this.mailSender.createMimeMessage();
             final MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            final String emailText = getEmailText(user, request);
+            final String emailText = getEmailText(user);
 
             helper.setFrom(sender);
             helper.setSubject(subject);
@@ -177,7 +176,7 @@ public class EmailBuilder {
      * Sends the email created by <code>createEmail</code> method.
      * @param user who'm email is sent.
      */
-    public void sendEmail(final User user, final HttpServletRequest request) {
-        this.mailSender.send(createEmail(user, request));
+    public void sendEmail(final User user) {
+        this.mailSender.send(createEmail(user));
     }
 }

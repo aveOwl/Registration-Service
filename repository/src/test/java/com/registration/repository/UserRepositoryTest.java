@@ -15,6 +15,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static com.registration.Points.VALID_EMAIL;
 import static com.registration.Points.VALID_PASSWORD;
 import static org.junit.Assert.*;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -28,7 +30,7 @@ public class UserRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
-    private User user;
+    private static User user;
 
     @Before
     public void setUp() throws Exception {
@@ -46,8 +48,10 @@ public class UserRepositoryTest {
 
         User user = this.userRepository.findByEmail(VALID_EMAIL);
 
-        assertEquals(user.getEmail(), VALID_EMAIL);
-        assertEquals(user.getPassword(), VALID_PASSWORD);
+        assertThat("should contain valid user email",
+                user.getEmail(), is(VALID_EMAIL));
+        assertThat("should contain valid user email",
+                user.getPassword(), is(VALID_PASSWORD));
     }
 
     @Test
@@ -56,13 +60,13 @@ public class UserRepositoryTest {
 
         User byEmail = this.userRepository.findByEmail(VALID_EMAIL);
 
-        assertEquals(user, byEmail);
+        assertThat("should be valid user", byEmail, is(user));
     }
 
     @Test
     public void shouldReturnNullOnNonExistingUser() throws Exception {
         User byEmail = this.userRepository.findByEmail(VALID_EMAIL);
 
-        assertEquals(null, byEmail);
+        assertNull("should be null value if user don't exist", byEmail);
     }
 }

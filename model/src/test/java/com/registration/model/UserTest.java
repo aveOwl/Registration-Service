@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 @RunWith(SpringRunner.class)
 public class UserTest {
 
-    private User user = null;
+    private static User user = null;
 
     @Before
     public void setUp() throws Exception {
@@ -48,9 +48,11 @@ public class UserTest {
 
         Set<ConstraintViolation<User>> violations = validateClass(user);
 
-        assertThat(violations.size(), is(1));
+        assertThat("should contain violation in password field",
+                violations.size(), is(1));
         for (ConstraintViolation<User> violation : violations) {
-            assertThat(violation.getMessage(), is(INVALID_PASSWORD_MSG));
+            assertThat("should contain corresponding violation message",
+                    violation.getMessage(), is(INVALID_PASSWORD_MSG));
         }
     }
 
@@ -61,9 +63,11 @@ public class UserTest {
 
         Set<ConstraintViolation<User>> violations = validateClass(user);
 
-        assertThat(violations.size(), is(1));
+        assertThat("should contain violation in email field",
+                violations.size(), is(1));
         for (ConstraintViolation<User> violation : violations) {
-            assertThat(violation.getMessage(), is(INVALID_EMAIL_MSG));
+            assertThat("should contain corresponding violation message",
+                    violation.getMessage(), is(INVALID_EMAIL_MSG));
         }
     }
 
@@ -74,13 +78,8 @@ public class UserTest {
 
         Set<ConstraintViolation<User>> violations = validateClass(user);
 
-        assertThat(violations.size(), is(0));
-    }
-
-    private Set<ConstraintViolation<User>> validateClass(User user) {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        return validator.validate(user);
+        assertThat("should not have violations on valid email and password",
+                violations.size(), is(0));
     }
 
     @Test
@@ -88,12 +87,8 @@ public class UserTest {
         User valid = new User(VALID_EMAIL, VALID_PASSWORD);
         User invalid = new User(INVALID_EMAIL, INVALID_PASSWORD);
 
-        assertThat(valid.equals(invalid), is(false));
-
-        valid.setConfirmed(true);
-        invalid.setConfirmed(true);
-
-        assertThat(valid.equals(invalid), is(false));
+        assertThat("two different users should not be equal",
+                valid.equals(invalid), is(false));
     }
 
     @Test
@@ -101,11 +96,19 @@ public class UserTest {
         User valid1 = new User(VALID_EMAIL, VALID_PASSWORD);
         User valid2 = new User(VALID_EMAIL, VALID_PASSWORD);
 
-        assertThat(valid1.equals(valid2), is(true));
+        assertThat("users should be equal",
+                valid1.equals(valid2), is(true));
 
         valid1.setConfirmed(true);
         valid2.setConfirmed(true);
 
-        assertThat(valid1.equals(valid2), is(true));
+        assertThat("confirmed users should be equal",
+                valid1.equals(valid2), is(true));
+    }
+
+    private Set<ConstraintViolation<User>> validateClass(User user) {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        return validator.validate(user);
     }
 }

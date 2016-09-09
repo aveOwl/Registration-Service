@@ -7,6 +7,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,9 +16,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.registration.Points.VALID_EMAIL;
+import static com.registration.Points.VALID_PASSWORD;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = MailServiceImpl.class)
@@ -28,14 +35,14 @@ public class MailServiceTest {
     @MockBean
     private EmailBuilder emailBuilder;
 
-    @MockBean
-    private HttpServletRequest request;
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
 
-    private User user;
+    private static User user;
 
     @Before
     public void setUp() throws Exception {
-        user = new User();
+        user = new User(VALID_EMAIL, VALID_PASSWORD);
     }
 
     @After
@@ -45,15 +52,20 @@ public class MailServiceTest {
 
     @Test
     public void shouldSendWithoutError() throws Exception {
-        mailService.sendMail(user, request);
+        mailService.sendMail(user);
 
-        verify(emailBuilder, atLeastOnce()).sendEmail(user, request);
+        verify(emailBuilder, only()).sendEmail(userCaptor.capture());
+
+        assertThat("should contain user email",
+                userCaptor.getValue().getEmail(), is(VALID_EMAIL));
+        assertThat("should contain user password",
+                userCaptor.getValue().getPassword(), is(VALID_PASSWORD));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowExceptionOnNullUser() throws Exception {
-        mailService.sendMail(null, request);
+        mailService.sendMail(null);
 
-        verify(emailBuilder, never()).sendEmail(null, request);
+        verify(emailBuilder, never()).sendEmail(null);
     }
 }
