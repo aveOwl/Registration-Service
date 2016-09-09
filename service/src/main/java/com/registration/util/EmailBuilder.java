@@ -32,12 +32,6 @@ public class EmailBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(EmailBuilder.class);
 
     /**
-     * Request URL.
-     */
-    @Value("${request.url}")
-    public String requestUrl;
-
-    /**
      * Confirmation URL.
      */
     private static final String CONFIRM = "http://localhost:8080/registration/confirm/";

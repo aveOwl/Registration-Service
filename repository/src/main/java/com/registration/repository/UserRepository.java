@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 /**
  * Spring Data repository for {@link User} entities.
  */
-@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
 }
