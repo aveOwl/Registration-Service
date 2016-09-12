@@ -3,13 +3,12 @@
 ##
 spring:
   profiles:
-    active: postgres
+    active: hsqldb
   thymeleaf:
     cache: false
   jpa:
     hibernate:
       ddl-auto: create-drop
-    show-sql: true
 
 ##
 # Tomcat configuration.
@@ -24,5 +23,3 @@ logging:
   level:
     com:
       registration: debug
-    org:
-      hibernate: debug

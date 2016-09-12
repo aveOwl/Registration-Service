@@ -3,10 +3,10 @@
 <head>
     <title>Registration Service</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <link rel="stylesheet" href="webjars/bootstrap/3.3.7/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="/css/style.css" />
-    <script src="webjars/angular/1.5.8/angular.min.js"></script>
-    <script src="/js/script.js"></script>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/dist/css/bootstrap.css}"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <script th:src="@{/webjars/angular/1.5.8/angular.min.js}"></script>
+    <script th:src="@{/js/script.js}"></script>
 </head>
 
 <body ng-controller="controller">
