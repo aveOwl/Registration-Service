@@ -17,13 +17,12 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    /**
-     * Logging system for this class.
-     */
+
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private UserRepository userRepository;
 
+    @Autowired
     public UserServiceImpl(final UserRepository userRepository) {
         this.userRepository = userRepository;
     }

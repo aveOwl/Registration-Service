@@ -48,11 +48,10 @@ public class UserTest {
 
         Set<ConstraintViolation<User>> violations = validateClass(user);
 
-        assertThat("should contain violation in password field",
-                violations.size(), is(1));
+        assertThat("violation in password field", violations.size(), is(1));
+
         for (ConstraintViolation<User> violation : violations) {
-            assertThat("should contain corresponding violation message",
-                    violation.getMessage(), is(INVALID_PASSWORD_MSG));
+            assertThat("password violation message", violation.getMessage(), is(INVALID_PASSWORD_MSG));
         }
     }
 
@@ -63,11 +62,9 @@ public class UserTest {
 
         Set<ConstraintViolation<User>> violations = validateClass(user);
 
-        assertThat("should contain violation in email field",
-                violations.size(), is(1));
+        assertThat("violation in email field", violations.size(), is(1));
         for (ConstraintViolation<User> violation : violations) {
-            assertThat("should contain corresponding violation message",
-                    violation.getMessage(), is(INVALID_EMAIL_MSG));
+            assertThat("email violation message", violation.getMessage(), is(INVALID_EMAIL_MSG));
         }
     }
 
@@ -78,8 +75,7 @@ public class UserTest {
 
         Set<ConstraintViolation<User>> violations = validateClass(user);
 
-        assertThat("should not have violations on valid email and password",
-                violations.size(), is(0));
+        assertThat("valid email and valid password", violations.size(), is(0));
     }
 
     @Test
@@ -96,14 +92,12 @@ public class UserTest {
         User valid1 = new User(VALID_EMAIL, VALID_PASSWORD);
         User valid2 = new User(VALID_EMAIL, VALID_PASSWORD);
 
-        assertThat("users should be equal",
-                valid1.equals(valid2), is(true));
+        assertThat("equal users", valid1.equals(valid2), is(true));
 
         valid1.setConfirmed(true);
         valid2.setConfirmed(true);
 
-        assertThat("confirmed users should be equal",
-                valid1.equals(valid2), is(true));
+        assertThat("confirmed users should be equal", valid1.equals(valid2), is(true));
     }
 
     private Set<ConstraintViolation<User>> validateClass(User user) {

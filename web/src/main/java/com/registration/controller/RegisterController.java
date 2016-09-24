@@ -21,21 +21,15 @@ import javax.validation.Valid;
 
 @Controller
 public class RegisterController extends BaseController {
-    /**
-     * Logging system for this class.
-     */
     private static final Logger LOG = LoggerFactory.getLogger(RegisterController.class);
 
     private UserService userService;
     private MailService mailService;
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public RegisterController(final UserService userService,
+                              final MailService mailService) {
         this.userService = userService;
-    }
-
-    @Autowired
-    public void setMailService(MailService mailService) {
         this.mailService = mailService;
     }
 

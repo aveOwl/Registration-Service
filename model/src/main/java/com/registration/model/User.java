@@ -13,16 +13,15 @@ import javax.validation.constraints.Pattern;
 
 import static com.registration.Points.*;
 
-/**
- * User entity class.
- */
 @Entity
 @Table(name = "users")
-@Component
 public class User {
 
     /**
-     * Regular Expression for password verification.
+     * Password must be from 6 to 20 characters long.
+     * Password must contain:
+     * - at least 2 digits.
+     * - at least one "!" symbol.
      */
     private static final String PASSWORD_REGEXP = "((?=(.*\\d){2})(?=.*[!]).{6,20})";
 
@@ -32,8 +31,8 @@ public class User {
     private Long id;
 
     /**
-     * Email must be valid according to
-     * {@link Email} annotation.
+     * Email must not be empty and be valid
+     * according to {@link Email} annotation.
      */
     @NotEmpty(message = EMPTY_EMAIL_MSG)
     @Email(message = INVALID_EMAIL_MSG)
@@ -41,19 +40,13 @@ public class User {
     private String email;
 
     /**
-     * Password must contain:
-     * - at least 2 digits.
-     * - at least one "!" symbol.
-     * - at least 6 at most 20 characters long.
+     * Password must not be empty.
      */
     @NotEmpty(message = EMPTY_PASSWORD_MSG)
     @Pattern(regexp = PASSWORD_REGEXP, message = INVALID_PASSWORD_MSG)
     @Column(name = "password")
     private String password;
 
-    /**
-     * Check user's registration confirm.
-     */
     @Column(name = "is_confirmed")
     private boolean isConfirmed;
 
@@ -96,11 +89,6 @@ public class User {
         isConfirmed = confirmed;
     }
 
-    /**already exists
-     * Compares this user to the specified user.
-     * @param other the other user.
-     * @return true if this user equals other; false otherwise.
-     */
     @Override
     public boolean equals(Object other) {
         if (other == this) return true;
@@ -112,10 +100,6 @@ public class User {
                 this.isConfirmed == that.isConfirmed);
     }
 
-    /**
-     * Returns a hash code for this user.
-     * @return a hash code for this user.
-     */
     @Override
     public int hashCode() {
         int hash = 17;
@@ -128,11 +112,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", isConfirmed=" + isConfirmed +
-                '}';
+        return String.format("id: %s, email: %s, password: %s, isConfirmed: %s",
+                this.id, this.email, this.password, this.isConfirmed);
     }
 }

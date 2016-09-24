@@ -9,18 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.registration.Points.VALID_EMAIL;
 import static com.registration.Points.VALID_PASSWORD;
-import static org.junit.Assert.*;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@ContextConfiguration(classes = UserRepository.class)
+@SpringBootTest(classes = UserRepository.class)
 @EntityScan(basePackages = "com.registration.model")
 public class UserRepositoryTest {
 
@@ -48,10 +48,8 @@ public class UserRepositoryTest {
 
         User user = this.userRepository.findByEmail(VALID_EMAIL);
 
-        assertThat("should contain valid user email",
-                user.getEmail(), is(VALID_EMAIL));
-        assertThat("should contain valid user email",
-                user.getPassword(), is(VALID_PASSWORD));
+        assertThat("valid user email", user.getEmail(), is(VALID_EMAIL));
+        assertThat("valid user password", user.getPassword(), is(VALID_PASSWORD));
     }
 
     @Test
@@ -60,7 +58,7 @@ public class UserRepositoryTest {
 
         User byEmail = this.userRepository.findByEmail(VALID_EMAIL);
 
-        assertThat("should be valid user", byEmail, is(user));
+        assertThat("valid user", byEmail, is(user));
     }
 
     @Test

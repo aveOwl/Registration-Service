@@ -39,8 +39,6 @@ public interface UserService {
 
     /**
      * Confirms user registration.
-     * Set flag 'is_confirmed' to true and
-     * updates user in database.
      * @param email email of user to confirm.
      */
     void confirm(String email);

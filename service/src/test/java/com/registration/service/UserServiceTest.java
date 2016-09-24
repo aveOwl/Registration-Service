@@ -75,17 +75,6 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldNotFindUserByEmail() throws Exception {
-        given(userRepository.findByEmail(VALID_EMAIL))
-                .willReturn(null);
-
-        expected.expect(EntityNotFoundException.class);
-        expected.expectMessage("No users were found by given email: " + VALID_EMAIL);
-
-        userService.findByEmail(VALID_EMAIL);
-    }
-
-    @Test
     public void shouldCreateUser() throws Exception {
         user.setId(null);
         

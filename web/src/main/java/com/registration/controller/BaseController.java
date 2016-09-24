@@ -12,9 +12,6 @@ import javax.persistence.NoResultException;
 
 @Controller
 public class BaseController {
-    /**
-     * Logging system for this class.
-     */
     private static final Logger LOG = LoggerFactory.getLogger(BaseController.class);
 
     /**

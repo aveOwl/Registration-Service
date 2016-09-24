@@ -14,38 +14,21 @@ import java.util.Properties;
 @Component
 @PropertySource("classpath:application-mail.properties")
 public class EmailConfig {
-    /**
-     * Logging system for this class.
-     */
+
     private static final Logger LOG = LoggerFactory.getLogger(EmailConfig.class);
 
-    /**
-     * Mail server host.
-     */
     @Value("${spring.mail.host}")
-    private String host;
+    private String mailHost;
 
-    /**
-     * Mail server port.
-     */
     @Value("${spring.mail.port}")
-    private String port;
+    private String mailPort;
 
-    /**
-     * Username for the account at the mail host.
-     */
-    @Value("${spring.mail.username}")
-    private String userName;
+    @Value("${spring.mail.email}")
+    private String senderEmail;
 
-    /**
-     * Password for the account at the mail host
-     */
     @Value("${spring.mail.password}")
-    private String password;
+    private String senderPassword;
 
-    /**
-     * Template loader path for the FreeMarker configuration.
-     */
     @Value("${spring.freemarker.template-loader-path}")
     public String templatePath;
 
@@ -53,13 +36,13 @@ public class EmailConfig {
     public JavaMailSenderImpl mailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 
-        javaMailSender.setHost(this.host);
-        javaMailSender.setPort(Integer.valueOf(this.port));
-        javaMailSender.setUsername(this.userName);
-        javaMailSender.setPassword(this.password);
+        javaMailSender.setHost(this.mailHost);
+        javaMailSender.setPort(Integer.valueOf(this.mailPort));
+        javaMailSender.setUsername(this.senderEmail);
+        javaMailSender.setPassword(this.senderPassword);
 
-        LOG.debug("Configuring sender properties: {host={}, port={}, username={}, password={}}",
-                this.host, this.port, this.userName, this.password);
+        LOG.debug("Configuring senderEmail properties: {mailHost={}, mailPort={}, senderEmail={}, senderPassword={}}",
+                this.mailHost, this.mailPort, this.senderEmail, this.senderPassword);
 
         Properties properties = new Properties();
         properties.put("mail.smtp.starttls.enable", true);

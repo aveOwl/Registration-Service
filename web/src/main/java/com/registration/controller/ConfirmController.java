@@ -20,16 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class ConfirmController extends BaseController {
-
-    /**
-     * Logging system for this class.
-     */
     private static final Logger LOG = LoggerFactory.getLogger(ConfirmController.class);
 
     private UserService userService;
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public ConfirmController(final UserService userService) {
         this.userService = userService;
     }
 
