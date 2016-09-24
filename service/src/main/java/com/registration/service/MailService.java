@@ -3,6 +3,7 @@ package com.registration.service;
 import com.registration.model.User;
 import com.registration.service.impl.MailServiceImpl;
 
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -22,5 +23,5 @@ public interface MailService {
      * Constructs and sends confirmation email.
      * @param user user for whom email is build and sent.
      */
-    void sendMail(User user);
+    void sendEmail(User user);
 }

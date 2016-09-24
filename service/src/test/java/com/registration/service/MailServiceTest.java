@@ -14,11 +14,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.servlet.http.HttpServletRequest;
-
 import static com.registration.Points.VALID_EMAIL;
 import static com.registration.Points.VALID_PASSWORD;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
@@ -52,20 +51,23 @@ public class MailServiceTest {
 
     @Test
     public void shouldSendWithoutError() throws Exception {
-        mailService.sendMail(user);
+        doNothing().when(emailBuilder).setRecipient(user);
 
-        verify(emailBuilder, only()).sendEmail(userCaptor.capture());
+        mailService.sendEmail(user);
 
-        assertThat("should contain user email",
+        verify(emailBuilder, atLeastOnce()).setRecipient(userCaptor.capture());
+        verify(emailBuilder, atLeastOnce()).sendEmail();
+
+        assertThat("user email",
                 userCaptor.getValue().getEmail(), is(VALID_EMAIL));
-        assertThat("should contain user password",
+        assertThat("user password",
                 userCaptor.getValue().getPassword(), is(VALID_PASSWORD));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowExceptionOnNullUser() throws Exception {
-        mailService.sendMail(null);
+        mailService.sendEmail(null);
 
-        verify(emailBuilder, never()).sendEmail(null);
+        verify(emailBuilder, never()).sendEmail();
     }
 }

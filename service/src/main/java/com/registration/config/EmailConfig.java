@@ -53,13 +53,13 @@ public class EmailConfig {
     public JavaMailSenderImpl mailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 
-        javaMailSender.setHost(host);
-        javaMailSender.setPort(Integer.valueOf(port));
-        javaMailSender.setUsername(userName);
-        javaMailSender.setPassword(password);
+        javaMailSender.setHost(this.host);
+        javaMailSender.setPort(Integer.valueOf(this.port));
+        javaMailSender.setUsername(this.userName);
+        javaMailSender.setPassword(this.password);
 
         LOG.debug("Configuring sender properties: {host={}, port={}, username={}, password={}}",
-                host, port, userName, password);
+                this.host, this.port, this.userName, this.password);
 
         Properties properties = new Properties();
         properties.put("mail.smtp.starttls.enable", true);
@@ -72,12 +72,12 @@ public class EmailConfig {
     }
 
     @Bean
-    public FreeMarkerConfigurer freeMarkerConfig() {
+    public FreeMarkerConfigurer freeMarkerConfigurer() {
         FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
 
-        freeMarkerConfigurer.setTemplateLoaderPath(templatePath);
+        freeMarkerConfigurer.setTemplateLoaderPath(this.templatePath);
 
-        LOG.debug("Configuring FreeMaker: {template-loader-path={}}", templatePath);
+        LOG.debug("Configuring FreeMaker: {template-loader-path={}}", this.templatePath);
 
         return freeMarkerConfigurer;
     }

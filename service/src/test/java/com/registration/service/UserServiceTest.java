@@ -4,8 +4,11 @@ import com.registration.model.User;
 import com.registration.repository.UserRepository;
 import com.registration.service.impl.UserServiceImpl;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -18,6 +21,9 @@ import org.springframework.util.Base64Utils;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
+
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static com.registration.Points.VALID_EMAIL;
 import static com.registration.Points.VALID_PASSWORD;
@@ -42,6 +48,9 @@ public class UserServiceTest {
     @Captor
     private ArgumentCaptor<User> userCaptor;
 
+    @Rule
+    public ExpectedException expected = ExpectedException.none();
+
     private static User user;
 
     @Before
@@ -59,12 +68,21 @@ public class UserServiceTest {
         given(userRepository.findByEmail(VALID_EMAIL))
                 .willReturn(user);
 
-        final User user = userService.findByEmail(VALID_EMAIL);
+        User user = userService.findByEmail(VALID_EMAIL);
 
-        assertThat("should contain user password",
-                user.getPassword(), is(VALID_PASSWORD));
-        assertThat("should contain user email",
-                user.getEmail(), is(VALID_EMAIL));
+        assertThat("user has password", user.getPassword(), is(VALID_PASSWORD));
+        assertThat("user has email", user.getEmail(), is(VALID_EMAIL));
+    }
+
+    @Test
+    public void shouldNotFindUserByEmail() throws Exception {
+        given(userRepository.findByEmail(VALID_EMAIL))
+                .willReturn(null);
+
+        expected.expect(EntityNotFoundException.class);
+        expected.expectMessage("No users were found by given email: " + VALID_EMAIL);
+
+        userService.findByEmail(VALID_EMAIL);
     }
 
     @Test
@@ -75,15 +93,16 @@ public class UserServiceTest {
 
         verify(userRepository, only()).save(userCaptor.capture());
 
-        assertThat("should contain corresponding user email",
-                user.getEmail(), is(userCaptor.getValue().getEmail()));
-        assertThat("should contain corresponding user password",
-                user.getPassword(), is(userCaptor.getValue().getPassword()));
+        assertThat("user email", user.getEmail(), is(userCaptor.getValue().getEmail()));
+        assertThat("user password", user.getPassword(), is(userCaptor.getValue().getPassword()));
     }
 
-    @Test(expected = EntityExistsException.class)
+    @Test
     public void shouldFailToCreateUser() throws Exception {
         user.setId(99L);
+
+        expected.expect(EntityExistsException.class);
+        expected.expectMessage("Cannot create new User with supplied id. The id attribute must be null.");
 
         userService.create(user);
 
@@ -104,9 +123,12 @@ public class UserServiceTest {
                 user.getPassword(), is(userCaptor.getValue().getPassword()));
     }
 
-    @Test(expected = EntityNotFoundException.class)
+    @Test
     public void shouldFailToUpdateWithNullId() throws Exception {
         user.setId(null);
+
+        expected.expect(EntityNotFoundException.class);
+        expected.expectMessage("Cannot preform update. The id attribute cannot be null.");
 
         userService.update(user);
 
@@ -135,10 +157,13 @@ public class UserServiceTest {
                 userCaptor.getValue().getPassword(), is(VALID_PASSWORD));
     }
 
-    @Test(expected = NoResultException.class)
+    @Test
     public void shouldFailToConfirmUser() throws Exception {
         given(userRepository.findByEmail(VALID_EMAIL))
                 .willReturn(null);
+
+        expected.expect(NoResultException.class);
+        expected.expectMessage("Invalid confirmation link.");
 
         userService.confirm("invalid code");
 
@@ -146,20 +171,5 @@ public class UserServiceTest {
 
         assertThat("user should not be confirmed",
                 user.isConfirmed(), is(false));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToCreateNullUser() throws Exception {
-        userService.create(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToUpdateNullUser() throws Exception {
-        userService.update(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailToFindByNullEmail() throws Exception {
-        userService.findByEmail(null);
     }
 }

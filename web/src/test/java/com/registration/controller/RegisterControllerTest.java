@@ -17,8 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.servlet.http.HttpServletRequest;
-
 import static com.registration.Points.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyString;
@@ -31,10 +29,8 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(RegisterController.class)
@@ -113,7 +109,7 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
         verify(userService, never()).create(user);
-        verify(mailService, never()).sendMail(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     /**
@@ -139,7 +135,7 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
         verify(userService, never()).create(user);
-        verify(mailService, never()).sendMail(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     /**
@@ -165,7 +161,7 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", is(INVALID_PASSWORD_MSG)));
 
         verify(userService, never()).create(user);
-        verify(mailService, never()).sendMail(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     /**
@@ -191,7 +187,7 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", is(INVALID_PASSWORD_MSG)));
 
         verify(userService, never()).create(user);
-        verify(mailService, never()).sendMail(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     /**
@@ -217,7 +213,7 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
         verify(userService, atLeastOnce()).create(user);
-        verify(mailService, atLeastOnce()).sendMail(user);
+        verify(mailService, atLeastOnce()).sendEmail(user);
     }
 
     /**

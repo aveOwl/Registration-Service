@@ -2,6 +2,7 @@ package com.registration.model;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +18,7 @@ import static com.registration.Points.*;
  */
 @Entity
 @Table(name = "users")
+@Component
 public class User {
 
     /**

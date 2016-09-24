@@ -7,10 +7,8 @@ import com.registration.util.ValidationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Controller
@@ -73,7 +70,7 @@ public class RegisterController extends BaseController {
         if (!bindingResult.hasErrors()) {
             LOG.info("User: {} verified", user);
             userService.create(user);
-            mailService.sendMail(user);
+            mailService.sendEmail(user);
         } else {
             LOG.error("User verification failed: {}", bindingResult.getFieldErrors());
         }

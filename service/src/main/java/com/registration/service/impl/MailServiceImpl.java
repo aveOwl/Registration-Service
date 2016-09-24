@@ -6,11 +6,13 @@ import com.registration.util.EmailBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailPreparationException;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.mail.internet.MimeMessage;
 
 @Service
 public class MailServiceImpl implements MailService {
@@ -22,16 +24,19 @@ public class MailServiceImpl implements MailService {
     private EmailBuilder emailBuilder;
 
     @Autowired
-    public void setEmailBuilder(EmailBuilder emailBuilder) {
+    public MailServiceImpl(final EmailBuilder emailBuilder) {
         this.emailBuilder = emailBuilder;
     }
 
     @Override
     @Async
-    public void sendMail(final User user) {
+    public void sendEmail(final User user) {
         Assert.notNull(user);
 
-        emailBuilder.sendEmail(user);
+        this.emailBuilder.setRecipient(user);
+
+        this.emailBuilder.sendEmail();
+
         LOG.info("Message sent.");
     }
 }

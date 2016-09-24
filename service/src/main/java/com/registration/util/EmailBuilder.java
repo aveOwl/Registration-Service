@@ -1,16 +1,17 @@
 package com.registration.util;
 
 import com.registration.model.User;
-import freemarker.template.utility.NullArgumentException;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.MailAuthenticationException;
+import org.springframework.core.io.Resource;
 import org.springframework.mail.MailPreparationException;
-import org.springframework.mail.MailSendException;
+import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -18,10 +19,12 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @PropertySource("classpath:application-mail.properties")
@@ -60,29 +63,111 @@ public class EmailBuilder {
     @Value("${spring.freemarker.resources}")
     public String resources;
 
+    private User user;
+
     private JavaMailSender mailSender;
-    private FreeMarkerConfigurer freeMarkerConfigurer;
+    private FreeMarkerConfigurer configurer;
 
     @Autowired
-    public void setJavaMailSender(JavaMailSender mailSender) {
+    public EmailBuilder(final FreeMarkerConfigurer configurer,
+                        final JavaMailSender mailSender) {
+        this.configurer = configurer;
         this.mailSender = mailSender;
     }
 
-    @Autowired
-    public void setFreeMarkerConfigurer(FreeMarkerConfigurer freeMarkerConfigurer) {
-        this.freeMarkerConfigurer = freeMarkerConfigurer;
+    /**
+     * Recipient of the email.
+     * @param user user for whom email is being created.
+     */
+    public void setRecipient(final User user) {
+        this.user = user;
+    }
+
+    /**
+     * Sends fully constructed email.
+     */
+    public void sendEmail() {
+        try {
+            MimeMessage email = this.getEmailMessage();
+
+            this.mailSender.send(email);
+        } catch (Exception e) {
+            LOG.error("Error while creating email: {}", e.getMessage());
+            throw new MailPreparationException("Failed to construct email.");
+        }
+    }
+
+    /**
+     * Completely constructs email. Specifying sender, subject,
+     * recipient, email body, resources.
+     * @return complete email message.
+     * @throws Exception on error.
+     */
+    private MimeMessage getEmailMessage() throws Exception {
+        MimeMessage message = this.mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        Resource logo = new ClassPathResource(this.resources);
+        String emailBody = this.getEmailBody();
+
+        helper.setFrom(this.sender);
+        helper.setSubject(this.subject);
+        helper.setTo(this.user.getEmail());
+        helper.setText(emailBody, true);
+        helper.addInline("mail-logo", logo); // image
+
+        LOG.debug("Constructing email: {Sender email address={}, Message subject={}, Recipient email address={}}",
+                this.sender, this.subject, this.user.getEmail());
+
+        return message;
+    }
+
+    /**
+     * Wires up template and model and converts it into String.
+     * @return String representation of the email body.
+     * @throws Exception on error.
+     */
+    private String getEmailBody() throws Exception {
+        Template template = this.configurer
+                .createConfiguration()
+                .getTemplate(this.templateName);
+
+        Map<String, String> model = this.getEmailModel();
+
+        String stringTemplate =
+                FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+
+        return stringTemplate;
+    }
+
+    /**
+     * Constructs confirmation email body for the given user,
+     * providing email, password and confirmation URL.
+     * @return map containing key-value pairs for
+     * email, password, and confirmation URL.
+     */
+    private Map<String, String> getEmailModel() {
+        Map<String, String> model = new HashMap<>();
+
+        model.put("email", this.user.getEmail());
+        model.put("password", this.getStarsPassword());
+        model.put("confirmUrl", this.getConfirmUrl());
+
+        LOG.debug("Constructing model: {email={}, password={}, confirmUrl={}}",
+                this.user.getEmail(), this.getStarsPassword(), this.getConfirmUrl());
+
+        return model;
     }
 
     /**
      * Constructs partly hidden user password,
      * revealing two last characters of the actual password
      * and replacing other characters with '*' symbol.
-     * @param user user who's password is manipulated.
      * @return sting same length as a password, revealing
      * only two last characters of it.
      */
-    private String getStarsPassword(final User user) {
-        char[] array = user.getEmail().toCharArray();
+    private String getStarsPassword() {
+        char[] array = this.user.getEmail().toCharArray();
         for (int i = 0; i < array.length - 2; i++) {
             array[i] = '*';
         }
@@ -94,83 +179,10 @@ public class EmailBuilder {
      * Using combination of user email and passwords creates
      * unique string with encrypted user data associated with
      * this specific user.
-     * @param user user for whom unique conformation link is being created.
      * @return conformation link which contains user specific data.
      */
-    private String getConfirmUrl(final User user) {
-        return CONFIRM + Base64Utils.encodeToString((user.getEmail() + ":" + user.getPassword()).getBytes());
-    }
-
-    /**
-     * Constructs conformation email text.
-     * Populates email body model and converts
-     * template with model into String.
-     * @param user user who's information is being processed.
-     * @return String containing email template with populated model.
-     * @throws MailPreparationException if error occurred.
-     */
-    private String getEmailText(final User user) {
-        try {
-            Map<String, Object> model = new HashMap<>();
-
-            model.put("email", user.getEmail());
-            model.put("password", getStarsPassword(user));
-            model.put("confirmUrl", getConfirmUrl(user));
-
-            LOG.debug("Constructing model: {email={}, password={}, confirmUrl={}}",
-                    user.getEmail(), getStarsPassword(user), getConfirmUrl(user));
-
-            final String text = FreeMarkerTemplateUtils.processTemplateIntoString(
-                    freeMarkerConfigurer
-                            .createConfiguration()
-                            .getTemplate(templateName), model);
-            return text;
-        } catch (Exception e) {
-            LOG.error("Error while composing email text: {}", e.getMessage());
-            throw new MailPreparationException("Failed to compose email text.");
-        }
-    }
-
-    /**
-     * Constructs email message by setting sender email address,
-     * message subject, recipient email address, using <code>getEmailText</code>
-     * method fetches email text body and adjusts needed resources.
-     * @param user user who'm email is being created.
-     * @return fully composed conformation email message.
-     * @throws MailPreparationException if error occurred.
-     */
-    private MimeMessage createEmail(final User user) {
-        try {
-            final MimeMessage message = this.mailSender.createMimeMessage();
-            final MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            final String emailText = getEmailText(user);
-
-            helper.setFrom(sender);
-            helper.setSubject(subject);
-            helper.setTo(user.getEmail());
-            helper.setText(emailText, true);
-
-            LOG.debug("Constructing email: " +
-                            "{Sender email address={}, Message subject={}, Recipient email address={}}",
-                    sender, subject, user.getEmail());
-
-            // needs to be configured after {setText} method.
-            ClassPathResource res = new ClassPathResource(resources);
-            // can be referenced in html using {src="cid:mail-logo"}.
-            helper.addInline("mail-logo", res);
-
-            return message;
-        } catch (Exception e) {
-            LOG.error("Error while creating email: {}", e.getMessage());
-            throw new MailPreparationException("Failed to construct email.");
-        }
-    }
-
-    /**
-     * Sends the email created by <code>createEmail</code> method.
-     * @param user who'm email is sent.
-     */
-    public void sendEmail(final User user) {
-        this.mailSender.send(createEmail(user));
+    private String getConfirmUrl() {
+        return CONFIRM +
+                Base64Utils.encodeToString((this.user.getEmail() + ":" + this.user.getPassword()).getBytes());
     }
 }
