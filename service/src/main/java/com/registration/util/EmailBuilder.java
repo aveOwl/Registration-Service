@@ -25,7 +25,6 @@ import java.util.Map;
 @PropertySource("classpath:application-mail.properties")
 public class EmailBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(EmailBuilder.class);
-
     private static final String CONFIRM_URI = "http://localhost:8080/registration/confirm/";
 
     @Value("${spring.mail.email}")
@@ -40,33 +39,29 @@ public class EmailBuilder {
     @Value("${spring.freemarker.resources}")
     public String resources;
 
-    private User user;
-
     private JavaMailSender mailSender;
     private FreeMarkerConfigurer configurer;
+    private MimeMessageHelperProvider helperProvider;
 
     @Autowired
     public EmailBuilder(final FreeMarkerConfigurer configurer,
-                        final JavaMailSender mailSender) {
+                        final JavaMailSender mailSender,
+                        final MimeMessageHelperProvider helperProvider) {
         this.configurer = configurer;
         this.mailSender = mailSender;
+        this.helperProvider = helperProvider;
     }
 
-    public void setRecipient(final User user) {
-        this.user = user;
-    }
-
-    /**
-     * Sends fully constructed email.
-     */
-    public void sendEmail() {
+    public MimeMessage createEmail(final User user) {
         try {
-            MimeMessage email = this.getEmailMessage();
+            MimeMessage message = this.getEmailMessage(user);
 
-            this.mailSender.send(email);
+            LOG.debug("Creating message with subject: {}", message.getSubject());
+
+            return message;
         } catch (Exception e) {
             LOG.error("Error while creating email: {}", e.getMessage());
-            throw new MailPreparationException("Failed to construct email.");
+            throw new MailPreparationException("Failed to construct email.", e);
         }
     }
 
@@ -76,21 +71,26 @@ public class EmailBuilder {
      * @return complete email message.
      * @throws Exception on error.
      */
-    private MimeMessage getEmailMessage() throws Exception {
+    private MimeMessage getEmailMessage(final User user) throws Exception {
         MimeMessage message = this.mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        MimeMessageHelper helper = this.helperProvider.getMimeMessageHelper(message);
+
+        if (helper == null) {
+            LOG.error("Failed to get message helper, message helper was null.");
+            throw new MailPreparationException("Failed to get message helper, message helper was null.");
+        }
 
         Resource logo = new ClassPathResource(this.resources);
-        String emailBody = this.getEmailBody();
+        String emailBody = this.getEmailBody(user);
 
         helper.setFrom(this.senderEmail);
         helper.setSubject(this.subject);
-        helper.setTo(this.user.getEmail());
+        helper.setTo(user.getEmail());
         helper.setText(emailBody, true);
         helper.addInline("mail-logo", logo); // image
 
         LOG.debug("Constructing email: {Sender email address={}, Message subject={}, Recipient email address={}}",
-                this.senderEmail, this.subject, this.user.getEmail());
+                this.senderEmail, this.subject, user.getEmail());
 
         return message;
     }
@@ -100,12 +100,12 @@ public class EmailBuilder {
      * @return String representation of the email body.
      * @throws Exception on error.
      */
-    private String getEmailBody() throws Exception {
+    private String getEmailBody(final User user) throws Exception {
         Template template = this.configurer
                 .createConfiguration()
                 .getTemplate(this.templateName);
 
-        Map<String, String> model = this.getEmailModel();
+        Map<String, String> model = this.getEmailModel(user);
 
         String stringTemplate =
                 FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
@@ -119,15 +119,15 @@ public class EmailBuilder {
      * @return map containing key-value pairs for
      * email, password, and confirmation URL.
      */
-    private Map<String, String> getEmailModel() {
+    private Map<String, String> getEmailModel(final User user) {
         Map<String, String> model = new HashMap<>();
 
-        model.put("email", this.user.getEmail());
-        model.put("password", this.getStarsPassword());
-        model.put("confirmUrl", this.getConfirmUrl());
+        model.put("email", user.getEmail());
+        model.put("password", this.getStarsPassword(user));
+        model.put("confirmUrl", this.getConfirmUrl(user));
 
         LOG.debug("Constructing model: {email={}, password={}, confirmUrl={}}",
-                this.user.getEmail(), this.getStarsPassword(), this.getConfirmUrl());
+                user.getEmail(), this.getStarsPassword(user), this.getConfirmUrl(user));
 
         return model;
     }
@@ -139,8 +139,8 @@ public class EmailBuilder {
      * @return String which has same length as a password, but reveals
      * only two last characters of it.
      */
-    private String getStarsPassword() {
-        char[] array = this.user.getEmail().toCharArray();
+    private String getStarsPassword(final User user) {
+        char[] array = user.getEmail().toCharArray();
         for (int i = 0; i < array.length - 2; i++) {
             array[i] = '*';
         }
@@ -153,8 +153,8 @@ public class EmailBuilder {
      * this specific user.
      * @return conformation link which contains user specific data.
      */
-    private String getConfirmUrl() {
+    private String getConfirmUrl(final User user) {
         return CONFIRM_URI +
-                Base64Utils.encodeToString((this.user.getEmail() + ":" + this.user.getPassword()).getBytes());
+                Base64Utils.encodeToString((user.getEmail() + ":" + user.getPassword()).getBytes());
     }
 }

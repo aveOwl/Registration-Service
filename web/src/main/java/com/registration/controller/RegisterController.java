@@ -20,7 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.validation.Valid;
 
 @Controller
-public class RegisterController extends BaseController {
+public class RegisterController {
     private static final Logger LOG = LoggerFactory.getLogger(RegisterController.class);
 
     private UserService userService;

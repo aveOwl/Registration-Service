@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.is;
 @RunWith(SpringRunner.class)
 public class UserTest {
 
-    private static User user = null;
+    private User user = null;
 
     @Before
     public void setUp() throws Exception {

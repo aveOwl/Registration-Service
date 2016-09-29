@@ -19,7 +19,7 @@ import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-public class ConfirmController extends BaseController {
+public class ConfirmController {
     private static final Logger LOG = LoggerFactory.getLogger(ConfirmController.class);
 
     private UserService userService;
@@ -41,6 +41,6 @@ public class ConfirmController extends BaseController {
     @RequestMapping(value = "/success", method = RequestMethod.GET)
     public String confirm() {
         LOG.info("Rendering success page...");
-        return "success";
+        return "success-page";
     }
 }

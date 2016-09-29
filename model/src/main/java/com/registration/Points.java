@@ -19,4 +19,6 @@ public final class Points {
     public static final String INVALID_PASSWORD_MSG = "Password is invalid.";
 
     public static final String DUPLICATE_EMAIL_MSG = "Email is taken.";
+
+    public static final String ERROR_MSG = "Test Error MSG";
 }

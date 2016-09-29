@@ -18,32 +18,37 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static com.registration.Points.*;
+import static com.registration.Points.DUPLICATE_EMAIL_MSG;
+import static com.registration.Points.ERROR_MSG;
+import static com.registration.Points.INVALID_EMAIL;
+import static com.registration.Points.INVALID_EMAIL_MSG;
+import static com.registration.Points.INVALID_PASSWORD;
+import static com.registration.Points.INVALID_PASSWORD_MSG;
+import static com.registration.Points.VALID_EMAIL;
+import static com.registration.Points.VALID_PASSWORD;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(RegisterController.class)
 public class RegisterControllerTest {
-
     private static final String REGISTRATION_URI = "/registration";
 
     @Autowired
     private MockMvc mvc;
-
-    @Autowired
-    private RegisterController registerController;
 
     @MockBean
     private UserService userService;
@@ -51,13 +56,16 @@ public class RegisterControllerTest {
     @MockBean
     private MailService mailService;
 
-    private static String inputJson;
+    private String inputJson;
 
-    private static User user;
+    private User user;
 
     @Before
     public void setUp() throws Exception {
-        this.mvc = MockMvcBuilders.standaloneSetup(registerController).build();
+        this.mvc = MockMvcBuilders.standaloneSetup(
+                new RegisterController(this.userService, this.mailService))
+                .setControllerAdvice(new MainControllerAdvice())
+                .build();
 
         user = new User(VALID_EMAIL, VALID_PASSWORD);
     }
@@ -69,13 +77,24 @@ public class RegisterControllerTest {
 
     @Test
     public void shouldRedirectToHomePage() throws Exception {
+        // when
         this.mvc.perform(get("/"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl(REGISTRATION_URI));
     }
 
     @Test
+    public void shouldRenderHomePage() throws Exception {
+        // when
+        this.mvc.perform(get(REGISTRATION_URI))
+                .andExpect(status().isOk())
+                .andExpect(model().hasNoErrors())
+                .andExpect(view().name("index"));
+    }
+
+    @Test
     public void shouldNotRegisterUserOnDuplicateEmail() throws Exception {
+        // given
         given(userService.findByEmail(VALID_EMAIL))
                 .willReturn(user);
 
@@ -84,102 +103,146 @@ public class RegisterControllerTest {
 
         inputJson = mapToJson(user);
 
+        // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(true)))
                 .andExpect(jsonPath("$.invalidPassword", is(false)))
                 .andExpect(jsonPath("$.emailViolationMessage", is(DUPLICATE_EMAIL_MSG)))
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
+        // then
         verify(userService, never()).create(user);
         verify(mailService, never()).sendEmail(user);
     }
 
     @Test
     public void shouldNotRegisterUserOnInvalidEmail() throws Exception {
+        // given
         user.setEmail(INVALID_EMAIL);
         user.setPassword(VALID_PASSWORD);
 
         inputJson = mapToJson(user);
 
+        // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(true)))
                 .andExpect(jsonPath("$.invalidPassword", is(false)))
                 .andExpect(jsonPath("$.emailViolationMessage", is(INVALID_EMAIL_MSG)))
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
+        // then
         verify(userService, never()).create(user);
         verify(mailService, never()).sendEmail(user);
     }
 
     @Test
     public void shouldNotRegisterUserOnInvalidPassword() throws Exception {
+        // given
         user.setEmail(VALID_EMAIL);
         user.setPassword(INVALID_PASSWORD);
 
         inputJson = mapToJson(user);
 
+        // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(false)))
                 .andExpect(jsonPath("$.invalidPassword", is(true)))
                 .andExpect(jsonPath("$.emailViolationMessage", isEmptyString()))
                 .andExpect(jsonPath("$.passwordViolationMessage", is(INVALID_PASSWORD_MSG)));
 
+        // then
         verify(userService, never()).create(user);
         verify(mailService, never()).sendEmail(user);
     }
 
     @Test
     public void shouldNotRegisterUserOnInvalidPasswordAndInvalidEmail() throws Exception {
+        // given
         user.setEmail(INVALID_EMAIL);
         user.setPassword(INVALID_PASSWORD);
 
         inputJson = mapToJson(user);
 
+        // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(true)))
                 .andExpect(jsonPath("$.invalidPassword", is(true)))
                 .andExpect(jsonPath("$.emailViolationMessage", is(INVALID_EMAIL_MSG)))
                 .andExpect(jsonPath("$.passwordViolationMessage", is(INVALID_PASSWORD_MSG)));
 
+        // then
         verify(userService, never()).create(user);
         verify(mailService, never()).sendEmail(user);
     }
 
     @Test
     public void shouldRegisterUserOnValidEmailAndPassword() throws Exception {
+        // given
         user.setEmail(VALID_EMAIL);
         user.setPassword(VALID_PASSWORD);
 
         inputJson = mapToJson(user);
 
+        // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(inputJson))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.invalidEmail", is(false)))
                 .andExpect(jsonPath("$.invalidPassword", is(false)))
                 .andExpect(jsonPath("$.emailViolationMessage", isEmptyString()))
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
+        // then
         verify(userService, atLeastOnce()).create(user);
         verify(mailService, atLeastOnce()).sendEmail(user);
+    }
+
+    @Test
+    public void shouldRenderErrorPageWithInternalServerErrorStatus() throws Exception {
+        // given
+        user.setEmail(VALID_EMAIL);
+        user.setPassword(VALID_PASSWORD);
+
+        inputJson = mapToJson(user);
+
+        doThrow(new NullPointerException(ERROR_MSG))
+                .when(userService).create(user);
+
+        // when
+        this.mvc.perform(post(REGISTRATION_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(inputJson))
+                .andExpect(status().isInternalServerError())
+                .andExpect(view().name("error"))
+                .andExpect(model().attribute("description", containsString(ERROR_MSG)));
+
+        // then
+        verify(userService, atLeastOnce()).create(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     /**

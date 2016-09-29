@@ -53,7 +53,7 @@ public class ValidationResult {
         StringBuilder emailMessageBuilder = new StringBuilder();
         StringBuilder passwordMessageBuilder = new StringBuilder();
 
-        // Build Email Violation message.
+        // Build ConfirmationEmail Violation message.
         if (invalidEmail) {
             for (FieldError error : bindingResult.getFieldErrors("email")) {
                 emailMessageBuilder.append(error.getDefaultMessage());

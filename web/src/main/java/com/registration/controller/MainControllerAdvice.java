@@ -3,16 +3,20 @@ package com.registration.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.persistence.NoResultException;
 
-@Controller
-public class BaseController {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseController.class);
+/**
+ * The MainControllerAdvice class provide a consistent response
+ * when Exceptions are thrown from <code>@RequestMapping</code> Controller methods.
+ */
+@ControllerAdvice
+public class MainControllerAdvice {
+    private static final Logger LOG = LoggerFactory.getLogger(MainControllerAdvice.class);
 
     /**
      * Handles specific NoResultException that is thrown if user attempts to confirm registration
@@ -25,7 +29,18 @@ public class BaseController {
     @ExceptionHandler(NoResultException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ModelAndView handleNoResultException(final NoResultException e) {
-        return getErrorModel(HttpStatus.BAD_REQUEST, e);
+        return getDefaultErrorModel(HttpStatus.BAD_REQUEST, e);
+    }
+
+    /**
+     * Handles <code>Exception</code> thrown from web service controller methods.
+     * @param ex A <code>Exception</code> instance.
+     * @return response with HTTP status code 500 and exception message.
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ModelAndView exception(final Exception ex) {
+        return this.getDefaultErrorModel(HttpStatus.INTERNAL_SERVER_ERROR, ex);
     }
 
     /**
@@ -34,7 +49,7 @@ public class BaseController {
      * @param e exception that needs to be handled.
      * @return complete error model for the view.
      */
-    private ModelAndView getErrorModel(final HttpStatus status, final Exception e) {
+    private ModelAndView getDefaultErrorModel(final HttpStatus status, final Exception e) {
         LOG.error(e.getMessage());
 
         ModelAndView model = new ModelAndView();
