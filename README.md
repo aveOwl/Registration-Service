@@ -1,6 +1,6 @@
 # Registration Service
 [![Build Status](https://travis-ci.org/aveOwl/Registration-Service.svg?branch=master)](https://travis-ci.org/aveOwl/Registration-Service)
-[![Coverage Status](https://coveralls.io/repos/github/aveOwl/Registration-Service/badge.svg?branch=master)](https://coveralls.io/github/aveOwl/Registration-Service)
+[![Coverage Status](https://coveralls.io/repos/github/aveOwl/Registration-Service/badge.svg?branch=master)](https://coveralls.io/github/aveOwl/Registration-Service?branch=master)
 
 **Technologies involved**
 * [Maven](https://maven.apache.org/)
