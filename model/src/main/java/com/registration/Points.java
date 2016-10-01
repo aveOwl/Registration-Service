@@ -20,5 +20,5 @@ public final class Points {
 
     public static final String DUPLICATE_EMAIL_MSG = "Email is taken.";
 
-    public static final String ERROR_MSG = "Test Error MSG";
+    public static final String TEST_ERROR_MSG = "Test Error Msg";
 }

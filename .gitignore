@@ -1,5 +1,4 @@
 .idea/
 *.iml
-service/src/main/resources/application-mail.properties
 target/
 .gitignore

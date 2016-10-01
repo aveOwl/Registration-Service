@@ -42,16 +42,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByEmail(final String email) {
-        Assert.notNull(email);
-
-        User user = userRepository.findByEmail(email);
-
-        LOG.debug("User entity: {} fetched by email: {}", user, email);
-        return user;
-    }
-
-    @Override
     public void update(final User user) {
         Assert.notNull(user);
 
@@ -66,24 +56,40 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void confirm(final String code) {
-        try {
-            Assert.notNull(code);
+        Assert.notNull(code);
 
+        String email = this.decodeEmail(code);
+        Optional<User> user = this.findByEmail(email);
+
+        User confirmedUser = user.orElseThrow(() -> new NoResultException("Invalid confirmation link"));
+
+        confirmedUser.setConfirmed(true);
+        this.update(confirmedUser);
+
+        LOG.debug("User: {} is confirmed.", confirmedUser);
+    }
+
+    private String decodeEmail(final String code) {
+        try {
             byte[] decodedData = Base64Utils.decodeFromString(code);
 
             String[] data = new String(decodedData).split(":"); // {'email', 'password'}
 
             String email = data[0];
 
-            User user = this.findByEmail(email);
-
-            if (user != null) {
-                user.setConfirmed(true);
-                this.update(user);
-                LOG.debug("User: {} is confirmed.", user);
-            }
+            return email;
         } catch (IllegalArgumentException e) {
-            throw new NoResultException("Invalid confirmation link.");
+            throw new NoResultException("Invalid confirmation link");
         }
+    }
+
+    @Override
+    public Optional<User> findByEmail(final String email) {
+        Assert.notNull(email);
+
+        User user = userRepository.findByEmail(email);
+
+        LOG.debug("User entity: {} fetched by email: {}", user, email);
+        return Optional.ofNullable(user);
     }
 }

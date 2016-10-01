@@ -44,50 +44,48 @@ public class ValidationResult {
      * @param bindingResult validation result.
      */
     public ValidationResult(final BindingResult bindingResult) {
-        success = !bindingResult.hasFieldErrors();
+        this.success = !bindingResult.hasFieldErrors();
 
-
-        invalidEmail = bindingResult.hasFieldErrors("email");
-        invalidPassword = bindingResult.hasFieldErrors("password");
+        this.invalidEmail = bindingResult.hasFieldErrors("email");
+        this.invalidPassword = bindingResult.hasFieldErrors("password");
 
         StringBuilder emailMessageBuilder = new StringBuilder();
         StringBuilder passwordMessageBuilder = new StringBuilder();
 
         // Build ConfirmationEmail Violation message.
-        if (invalidEmail) {
+        if (this.invalidEmail) {
             for (FieldError error : bindingResult.getFieldErrors("email")) {
                 emailMessageBuilder.append(error.getDefaultMessage());
             }
         }
-        emailViolationMessage = emailMessageBuilder.toString();
+        this.emailViolationMessage = emailMessageBuilder.toString();
 
         // Build Password Violation message.
-        if (invalidPassword) {
+        if (this.invalidPassword) {
             for (FieldError error : bindingResult.getFieldErrors("password")) {
                 passwordMessageBuilder.append(error.getDefaultMessage());
             }
         }
-        passwordViolationMessage = passwordMessageBuilder.toString();
+        this.passwordViolationMessage = passwordMessageBuilder.toString();
     }
 
     public boolean isSuccess() {
-        return success;
+        return this.success;
     }
 
     public boolean isInvalidEmail() {
-        return invalidEmail;
+        return this.invalidEmail;
     }
 
     public boolean isInvalidPassword() {
-        return invalidPassword;
+        return this.invalidPassword;
     }
 
-
     public String getEmailViolationMessage() {
-        return emailViolationMessage;
+        return this.emailViolationMessage;
     }
 
     public String getPasswordViolationMessage() {
-        return passwordViolationMessage;
+        return this.passwordViolationMessage;
     }
 }

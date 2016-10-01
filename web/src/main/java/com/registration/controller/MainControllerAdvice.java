@@ -50,8 +50,6 @@ public class MainControllerAdvice {
      * @return complete error model for the view.
      */
     private ModelAndView getDefaultErrorModel(final HttpStatus status, final Exception e) {
-        LOG.error(e.getMessage());
-
         ModelAndView model = new ModelAndView();
 
         final String desc = "There is no content available. " + e.getMessage();

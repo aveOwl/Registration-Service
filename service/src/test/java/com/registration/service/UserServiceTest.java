@@ -21,6 +21,8 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 
+import java.util.Optional;
+
 import static com.registration.Points.VALID_EMAIL;
 import static com.registration.Points.VALID_PASSWORD;
 import static org.hamcrest.core.Is.is;
@@ -66,11 +68,25 @@ public class UserServiceTest {
                 .willReturn(user);
 
         // when
-        User user = userService.findByEmail(VALID_EMAIL);
+        Optional<User> user = userService.findByEmail(VALID_EMAIL);
 
         // then
-        assertThat("user has password", user.getPassword(), is(VALID_PASSWORD));
-        assertThat("user has email", user.getEmail(), is(VALID_EMAIL));
+        assertThat("user is present", user.isPresent(), is(true));
+        assertThat("user has password", user.get().getPassword(), is(VALID_PASSWORD));
+        assertThat("user has email", user.get().getEmail(), is(VALID_EMAIL));
+    }
+
+    @Test
+    public void shouldReturnEmptyIfNoUsersFoundByEmail() throws Exception {
+        // given
+        given(userRepository.findByEmail(VALID_EMAIL))
+                .willReturn(null);
+
+        // when
+        Optional<User> user = userService.findByEmail(VALID_EMAIL);
+
+        // then
+        assertThat("user is not present", user.isPresent(), is(false));
     }
 
     @Test
@@ -136,7 +152,6 @@ public class UserServiceTest {
         verify(userRepository, never()).save(user);
     }
 
-
     @Test
     public void shouldConfirmUser() throws Exception {
         // given
@@ -162,16 +177,37 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldFailToConfirmUser() throws Exception {
+    public void shouldFailToConfirmUserIfFailedToDecode() throws Exception {
         // given
         given(userRepository.findByEmail(VALID_EMAIL))
                 .willReturn(null);
 
         expected.expect(NoResultException.class);
-        expected.expectMessage("Invalid confirmation link.");
+        expected.expectMessage("Invalid confirmation link");
 
         // when
         userService.confirm("invalid code");
+
+        // then
+        verify(userRepository, never()).save(user);
+
+        assertThat("user should not be confirmed",
+                user.isConfirmed(), is(false));
+    }
+
+    @Test
+    public void shouldFailToConfirmUserIfFailedToFoundUser() throws Exception {
+        // given
+        String code = Base64Utils.encodeToString(VALID_EMAIL.getBytes());
+
+        given(userRepository.findByEmail(VALID_EMAIL))
+                .willReturn(null);
+
+        expected.expect(NoResultException.class);
+        expected.expectMessage("Invalid confirmation link");
+
+        // when
+        userService.confirm(code);
 
         // then
         verify(userRepository, never()).save(user);

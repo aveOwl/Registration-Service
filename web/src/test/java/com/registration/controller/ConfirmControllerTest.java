@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.persistence.NoResultException;
 
-import static com.registration.Points.ERROR_MSG;
+import static com.registration.Points.TEST_ERROR_MSG;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -70,14 +70,14 @@ public class ConfirmControllerTest {
     @Test
     public void shouldRenderErrorPageWithBadRequestStatus() throws Exception {
         // given
-        doThrow(new NoResultException(ERROR_MSG))
+        doThrow(new NoResultException(TEST_ERROR_MSG))
                 .when(userService).confirm(TEST_HASH);
 
         // when
         this.mvc.perform(get(CONFIRMATION_URI + "/" + TEST_HASH))
                 .andExpect(status().isBadRequest())
                 .andExpect(view().name("error"))
-                .andExpect(model().attribute("description", containsString(ERROR_MSG)));
+                .andExpect(model().attribute("description", containsString(TEST_ERROR_MSG)));
 
         // then
         verify(userService, only()).confirm(TEST_HASH);

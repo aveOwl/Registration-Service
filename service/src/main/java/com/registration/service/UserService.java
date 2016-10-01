@@ -26,10 +26,10 @@ public interface UserService {
     /**
      * Searches for user with given email.
      * @param email email to find user.
-     * @return {@link User} object with given email or <code>null</code>
+     * @return {@link User} object with given email or <code>Optional.empty()</code>
      * if no {@link User} is associated with given email.
      */
-     User findByEmail(String email);
+     Optional<User> findByEmail(String email);
 
     /**
      * Updates a User entity in the database.

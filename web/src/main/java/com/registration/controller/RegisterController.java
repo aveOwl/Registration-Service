@@ -19,6 +19,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 
+import static com.registration.Points.DUPLICATE_EMAIL_MSG;
+
 @Controller
 public class RegisterController {
     private static final Logger LOG = LoggerFactory.getLogger(RegisterController.class);
@@ -31,11 +33,6 @@ public class RegisterController {
                               final MailService mailService) {
         this.userService = userService;
         this.mailService = mailService;
-    }
-
-    @ModelAttribute
-    public User getUser() {
-        return new User();
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -57,16 +54,17 @@ public class RegisterController {
         LOG.info("Attempting user registration...");
 
         if (!bindingResult.hasErrors() &&
-            userService.findByEmail(user.getEmail()) != null) {
-            bindingResult.addError(new FieldError("user", "email", "Email is taken."));
+            this.userService.findByEmail(user.getEmail()).isPresent()) {
+            bindingResult.addError(new FieldError("user", "email", DUPLICATE_EMAIL_MSG));
         }
 
         if (!bindingResult.hasErrors()) {
-            LOG.info("User: {} verified", user);
-            userService.create(user);
-            mailService.sendEmail(user);
+            LOG.debug("Input: email = {}, password = {} is verified",
+                    user.getEmail(), user.getPassword());
+            this.userService.create(user);
+            this.mailService.sendEmail(user);
         } else {
-            LOG.error("User verification failed: {}", bindingResult.getFieldErrors());
+            LOG.error("Input verification failed: {}", bindingResult.getFieldErrors());
         }
         return new ValidationResult(bindingResult);
     }

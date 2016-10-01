@@ -18,8 +18,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Optional;
+
 import static com.registration.Points.DUPLICATE_EMAIL_MSG;
-import static com.registration.Points.ERROR_MSG;
+import static com.registration.Points.TEST_ERROR_MSG;
 import static com.registration.Points.INVALID_EMAIL;
 import static com.registration.Points.INVALID_EMAIL_MSG;
 import static com.registration.Points.INVALID_PASSWORD;
@@ -96,7 +98,7 @@ public class RegisterControllerTest {
     public void shouldNotRegisterUserOnDuplicateEmail() throws Exception {
         // given
         given(userService.findByEmail(VALID_EMAIL))
-                .willReturn(user);
+                .willReturn(Optional.of(user));
 
         user.setEmail(VALID_EMAIL);
         user.setPassword(VALID_PASSWORD);
@@ -201,6 +203,9 @@ public class RegisterControllerTest {
         user.setEmail(VALID_EMAIL);
         user.setPassword(VALID_PASSWORD);
 
+        given(userService.findByEmail(VALID_EMAIL))
+                .willReturn(Optional.empty());
+
         inputJson = mapToJson(user);
 
         // when
@@ -226,9 +231,12 @@ public class RegisterControllerTest {
         user.setEmail(VALID_EMAIL);
         user.setPassword(VALID_PASSWORD);
 
+        given(userService.findByEmail(user.getEmail()))
+                .willReturn(Optional.empty());
+
         inputJson = mapToJson(user);
 
-        doThrow(new NullPointerException(ERROR_MSG))
+        doThrow(new IllegalArgumentException(TEST_ERROR_MSG))
                 .when(userService).create(user);
 
         // when
@@ -238,7 +246,7 @@ public class RegisterControllerTest {
                 .content(inputJson))
                 .andExpect(status().isInternalServerError())
                 .andExpect(view().name("error"))
-                .andExpect(model().attribute("description", containsString(ERROR_MSG)));
+                .andExpect(model().attribute("description", containsString(TEST_ERROR_MSG)));
 
         // then
         verify(userService, atLeastOnce()).create(user);
