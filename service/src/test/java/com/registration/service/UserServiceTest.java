@@ -36,6 +36,7 @@ import static org.mockito.Mockito.only;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = UserServiceImpl.class)
 public class UserServiceTest {
+    private static final Long TEST_ID = 99L;
 
     @Autowired
     private UserService userService;
@@ -59,6 +60,93 @@ public class UserServiceTest {
     @After
     public void tearDown() throws Exception {
         user = null;
+    }
+
+    @Test
+    public void shouldCreateUser() throws Exception {
+        // given
+        user.setId(null);
+
+        // when
+        userService.create(user);
+
+        // then
+        verify(userRepository, only()).save(userCaptor.capture());
+
+        assertThat("user email", user.getEmail(), is(userCaptor.getValue().getEmail()));
+        assertThat("user password", user.getPassword(), is(userCaptor.getValue().getPassword()));
+    }
+
+    @Test
+    public void shouldFailToCreateUserWithId() throws Exception {
+        // given
+        user.setId(TEST_ID);
+
+        expected.expect(EntityExistsException.class);
+        expected.expectMessage(
+                "Cannot create new User with supplied id. The id attribute must be null.");
+
+        // when
+        userService.create(user);
+
+        // then
+        verify(userRepository, never()).save(user);
+    }
+
+    @Test
+    public void shouldFailToCreateNullUser() throws Exception {
+        // given
+        expected.expect(IllegalArgumentException.class);
+        expected.expectMessage("User can't be null.");
+
+        // when
+        userService.create(null);
+
+        // then
+        verify(userRepository, never()).save(user);
+    }
+
+    @Test
+    public void shouldUpdateUser() throws Exception {
+        // given
+        user.setId(TEST_ID);
+
+        // when
+        userService.update(user);
+
+        // then
+        verify(userRepository, only()).save(userCaptor.capture());
+
+        assertThat("user email", user.getEmail(), is(userCaptor.getValue().getEmail()));
+        assertThat("user password", user.getPassword(), is(userCaptor.getValue().getPassword()));
+    }
+
+    @Test
+    public void shouldFailToUpdateUserWithNullId() throws Exception {
+        // given
+        user.setId(null);
+
+        expected.expect(EntityNotFoundException.class);
+        expected.expectMessage("Cannot perform update. The id attribute can't be null.");
+
+        // when
+        userService.update(user);
+
+        // then
+        verify(userRepository, never()).save(user);
+    }
+
+    @Test
+    public void shouldFailToUpdateNullUser() throws Exception {
+        // given
+        expected.expect(IllegalArgumentException.class);
+        expected.expectMessage("User can't be null.");
+
+        // when
+        userService.update(null);
+
+        // then
+        verify(userRepository, never()).save(user);
     }
 
     @Test
@@ -90,66 +178,16 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldCreateUser() throws Exception {
+    public void shouldThrowExceptionOnNullEmail() throws Exception {
         // given
-        user.setId(null);
+        expected.expect(IllegalArgumentException.class);
+        expected.expectMessage("Email can't be null.");
 
         // when
-        userService.create(user);
+        Optional<User> user = userService.findByEmail(null);
 
         // then
-        verify(userRepository, only()).save(userCaptor.capture());
-
-        assertThat("user email", user.getEmail(), is(userCaptor.getValue().getEmail()));
-        assertThat("user password", user.getPassword(), is(userCaptor.getValue().getPassword()));
-    }
-
-    @Test
-    public void shouldFailToCreateUser() throws Exception {
-        // given
-        user.setId(99L);
-
-        expected.expect(EntityExistsException.class);
-        expected.expectMessage(
-                "Cannot create new User with supplied id. The id attribute must be null.");
-
-        // when
-        userService.create(user);
-
-        // then
-        verify(userRepository, never()).save(user);
-    }
-
-    @Test
-    public void shouldUpdateUser() throws Exception {
-        // given
-        user.setId(99L);
-
-        // when
-        userService.update(user);
-
-        // then
-        verify(userRepository, only()).save(userCaptor.capture());
-
-        assertThat("should contain corresponding user email",
-                user.getEmail(), is(userCaptor.getValue().getEmail()));
-        assertThat("should contain corresponding user password",
-                user.getPassword(), is(userCaptor.getValue().getPassword()));
-    }
-
-    @Test
-    public void shouldFailToUpdateWithNullId() throws Exception {
-        // given
-        user.setId(null);
-
-        expected.expect(EntityNotFoundException.class);
-        expected.expectMessage("Cannot preform update. The id attribute cannot be null.");
-
-        // when
-        userService.update(user);
-
-        // then
-        verify(userRepository, never()).save(user);
+        assertThat("user is not present", user.isPresent(), is(false));
     }
 
     @Test
@@ -160,7 +198,7 @@ public class UserServiceTest {
         given(userRepository.findByEmail(VALID_EMAIL))
                 .willReturn(user);
 
-        user.setId(99L);
+        user.setId(TEST_ID);
 
         // when
         userService.confirm(code);
@@ -168,12 +206,9 @@ public class UserServiceTest {
         // then
         verify(userRepository, atLeastOnce()).save(userCaptor.capture());
 
-        assertThat("user should be confirmed",
-                userCaptor.getValue().isConfirmed(), is(true));
-        assertThat("user should have valid email",
-                userCaptor.getValue().getEmail(), is(VALID_EMAIL));
-        assertThat("user should have valid password",
-                userCaptor.getValue().getPassword(), is(VALID_PASSWORD));
+        assertThat("user confirmed", userCaptor.getValue().isConfirmed(), is(true));
+        assertThat("user email", userCaptor.getValue().getEmail(), is(VALID_EMAIL));
+        assertThat("user password", userCaptor.getValue().getPassword(), is(VALID_PASSWORD));
     }
 
     @Test
@@ -183,7 +218,7 @@ public class UserServiceTest {
                 .willReturn(null);
 
         expected.expect(NoResultException.class);
-        expected.expectMessage("Invalid confirmation link");
+        expected.expectMessage("Invalid confirmation link.");
 
         // when
         userService.confirm("invalid code");
@@ -191,8 +226,7 @@ public class UserServiceTest {
         // then
         verify(userRepository, never()).save(user);
 
-        assertThat("user should not be confirmed",
-                user.isConfirmed(), is(false));
+        assertThat("user not confirmed", user.isConfirmed(), is(false));
     }
 
     @Test
@@ -204,7 +238,7 @@ public class UserServiceTest {
                 .willReturn(null);
 
         expected.expect(NoResultException.class);
-        expected.expectMessage("Invalid confirmation link");
+        expected.expectMessage("Invalid confirmation link.");
 
         // when
         userService.confirm(code);
@@ -212,7 +246,6 @@ public class UserServiceTest {
         // then
         verify(userRepository, never()).save(user);
 
-        assertThat("user should not be confirmed",
-                user.isConfirmed(), is(false));
+        assertThat("user not confirmed", user.isConfirmed(), is(false));
     }
 }

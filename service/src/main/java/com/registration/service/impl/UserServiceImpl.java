@@ -17,10 +17,9 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public UserServiceImpl(final UserRepository userRepository) {
@@ -29,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void create(final User user) {
-        Assert.notNull(user);
+        Assert.notNull(user, "User can't be null.");
 
         if (user.getId() != null) {
             LOG.error("Attempted to create a User object, but id attribute was not null.");
@@ -37,31 +36,41 @@ public class UserServiceImpl implements UserService {
                     "Cannot create new User with supplied id. The id attribute must be null.");
         }
 
-        User savedUser = userRepository.save(user);
+        final User savedUser = this.userRepository.save(user);
         LOG.debug("Persisted user entity: {}", savedUser);
     }
 
     @Override
     public void update(final User user) {
-        Assert.notNull(user);
+        Assert.notNull(user, "User can't be null.");
 
         if (user.getId() == null) {
             LOG.error("Attempted to update a User object, but id attribute was null.");
-            throw new EntityNotFoundException("Cannot preform update. The id attribute cannot be null.");
+            throw new EntityNotFoundException("Cannot perform update. The id attribute can't be null.");
         }
 
-        User updatedUser = userRepository.save(user);
+        final User updatedUser = this.userRepository.save(user);
         LOG.info("Updated user entity: {}", updatedUser);
     }
 
     @Override
-    public void confirm(final String code) {
-        Assert.notNull(code);
+    public Optional<User> findByEmail(final String email) {
+        Assert.notNull(email, "Email can't be null.");
 
-        String email = this.decodeEmail(code);
-        Optional<User> user = this.findByEmail(email);
+        final User user = this.userRepository.findByEmail(email);
 
-        User confirmedUser = user.orElseThrow(() -> new NoResultException("Invalid confirmation link"));
+        LOG.debug("User entity: {} fetched by email: {}", user, email);
+        return Optional.ofNullable(user);
+    }
+
+    @Override
+    public void confirm(final String confirmationCode) {
+        Assert.notNull(confirmationCode, "Confirmation code can't be null.");
+
+        final String email = this.decodeEmail(confirmationCode);
+        final Optional<User> user = this.findByEmail(email);
+
+        final User confirmedUser = user.orElseThrow(() -> new NoResultException("Invalid confirmation link."));
 
         confirmedUser.setConfirmed(true);
         this.update(confirmedUser);
@@ -69,27 +78,15 @@ public class UserServiceImpl implements UserService {
         LOG.debug("User: {} is confirmed.", confirmedUser);
     }
 
-    private String decodeEmail(final String code) {
+    private String decodeEmail(final String confirmationCode) {
         try {
-            byte[] decodedData = Base64Utils.decodeFromString(code);
+            final byte[] decodedData = Base64Utils.decodeFromString(confirmationCode);
 
-            String[] data = new String(decodedData).split(":"); // {'email', 'password'}
+            final String[] data = new String(decodedData).split(":"); // {'email', 'password'}
 
-            String email = data[0];
-
-            return email;
+            return data[0];
         } catch (IllegalArgumentException e) {
-            throw new NoResultException("Invalid confirmation link");
+            throw new NoResultException("Invalid confirmation link.");
         }
-    }
-
-    @Override
-    public Optional<User> findByEmail(final String email) {
-        Assert.notNull(email);
-
-        User user = userRepository.findByEmail(email);
-
-        LOG.debug("User entity: {} fetched by email: {}", user, email);
-        return Optional.ofNullable(user);
     }
 }
