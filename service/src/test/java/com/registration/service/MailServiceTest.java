@@ -77,15 +77,14 @@ public class MailServiceTest {
         verify(emailBuilder, atLeastOnce()).createEmail(userCaptor.capture());
         verify(mailSender, atLeastOnce()).send(email);
 
-        assertThat("user email",
-                userCaptor.getValue().getEmail(), is(VALID_EMAIL));
-        assertThat("user password",
-                userCaptor.getValue().getPassword(), is(VALID_PASSWORD));
+        assertThat("user email", userCaptor.getValue().getEmail(), is(VALID_EMAIL));
+        assertThat("user password", userCaptor.getValue().getPassword(), is(VALID_PASSWORD));
     }
 
     @Test
     public void shouldThrowExceptionOnNullUser() throws Exception {
         thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("User can't be null.");
 
         // when
         mailService.sendEmail(null);

@@ -18,27 +18,31 @@ import java.util.Optional;
 public interface UserService {
 
     /**
-     * Persists a User entity in the database.
-     * @param user a User object to be persisted.
+     * Persists given User entity in the database.
+     *
+     * @param user a User entity to be persisted.
      */
     void create(User user);
 
     /**
-     * Searches for user with given email.
-     * @param email email to find user.
-     * @return {@link User} object with given email or <code>Optional.empty()</code>
-     * if no {@link User} is associated with given email.
+     * Retrieves user entity from the database using given user email.
+     *
+     * @param email email of the user to be searched.
+     * @return User entity with given email or <code>Optional.empty()</code>
+     * if no User is associated with the given email.
      */
      Optional<User> findByEmail(String email);
 
     /**
-     * Updates a User entity in the database.
-     * @param user a User object to be updated.
+     * Updates given User entity in the database.
+     *
+     * @param user a User entity to be updated.
      */
     void update(User user);
 
     /**
      * Confirms user registration.
+     *
      * @param email email of user to confirm.
      */
     void confirm(String email);

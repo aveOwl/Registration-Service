@@ -10,6 +10,9 @@ import javax.mail.internet.MimeMessage;
 public class MimeMessageHelperProviderImpl implements MimeMessageHelperProvider {
     private static final String CHARACTER_ENCODING = "UTF-8";
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MimeMessageHelper getMimeMessageHelper(final MimeMessage message) throws MessagingException {
         return new MimeMessageHelper(message, true, CHARACTER_ENCODING);

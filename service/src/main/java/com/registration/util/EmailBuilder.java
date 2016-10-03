@@ -25,7 +25,7 @@ import java.util.Map;
 @PropertySource("classpath:application-mail.properties")
 public class EmailBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(EmailBuilder.class);
-    private static final String CONFIRM_URI = "http://localhost:8080/registration/confirm/";
+    private static final String CONFIRM_URI = "http://localhost:8080/registration/confirm/"; // TODO deal with this
 
     @Value("${spring.mail.email}")
     private String senderEmail;
@@ -52,11 +52,18 @@ public class EmailBuilder {
         this.helperProvider = helperProvider;
     }
 
+    /**
+     * Creates complete email message and handles exceptions that may occur
+     * during the email assembling process.
+     *
+     * @return completed email message.
+     */
     public MimeMessage createEmail(final User user) {
         try {
             MimeMessage message = this.getEmailMessage(user);
 
-            LOG.debug("Creating message with subject: {}", message.getSubject());
+            LOG.debug("Creating message with subject: {} for User: {}",
+                    message.getSubject(), user);
 
             return message;
         } catch (Exception e) {
@@ -66,22 +73,23 @@ public class EmailBuilder {
     }
 
     /**
-     * Completely constructs email. Specifying senderEmail, subject,
-     * recipient, email body, resources.
+     * Completely constructs email. Specifies sender ard recipient
+     * information, email body.
+     *
      * @return complete email message.
      * @throws Exception on error.
      */
     private MimeMessage getEmailMessage(final User user) throws Exception {
-        MimeMessage message = this.mailSender.createMimeMessage();
-        MimeMessageHelper helper = this.helperProvider.getMimeMessageHelper(message);
+        final MimeMessage message = this.mailSender.createMimeMessage();
+        final MimeMessageHelper helper = this.helperProvider.getMimeMessageHelper(message);
 
         if (helper == null) {
             LOG.error("Failed to get message helper, message helper was null.");
             throw new MailPreparationException("Failed to get message helper, message helper was null.");
         }
 
-        Resource logo = new ClassPathResource(this.resources);
-        String emailBody = this.getEmailBody(user);
+        final Resource logo = new ClassPathResource(this.resources);
+        final String emailBody = this.getEmailBody(user);
 
         helper.setFrom(this.senderEmail);
         helper.setSubject(this.subject);
@@ -97,30 +105,29 @@ public class EmailBuilder {
 
     /**
      * Wires up template and model and converts it into String.
+     *
      * @return String representation of the email body.
      * @throws Exception on error.
      */
     private String getEmailBody(final User user) throws Exception {
-        Template template = this.configurer
+        final Template template = this.configurer
                 .createConfiguration()
                 .getTemplate(this.templateName);
 
-        Map<String, String> model = this.getEmailModel(user);
+        final Map<String, String> model = this.getEmailModel(user);
 
-        String stringTemplate =
-                FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
-
-        return stringTemplate;
+        return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
 
     /**
      * Constructs confirmation email body for the given user,
      * providing email, password and confirmation URL.
+     *
      * @return map containing key-value pairs for
      * email, password, and confirmation URL.
      */
     private Map<String, String> getEmailModel(final User user) {
-        Map<String, String> model = new HashMap<>();
+        final Map<String, String> model = new HashMap<>();
 
         model.put("email", user.getEmail());
         model.put("password", this.getStarsPassword(user));
@@ -133,14 +140,13 @@ public class EmailBuilder {
     }
 
     /**
-     * Constructs partly hidden user password,
-     * revealing two last characters of the actual password
-     * and replacing other characters with '*' symbol.
-     * @return String which has same length as a password, but reveals
-     * only two last characters of it.
+     * Constructs partly hidden user password, revealing two last characters
+     * of the actual password and replacing other characters with '*' symbol.
+     *
+     * @return a string representing partly hidden user password.
      */
     private String getStarsPassword(final User user) {
-        char[] array = user.getEmail().toCharArray();
+        final char[] array = user.getEmail().toCharArray();
         for (int i = 0; i < array.length - 2; i++) {
             array[i] = '*';
         }
@@ -148,9 +154,9 @@ public class EmailBuilder {
     }
 
     /**
-     * Using combination of user email and passwords creates
-     * unique string with encrypted user data associated with
-     * this specific user.
+     * Creates unique string with encrypted user email and password
+     * associated with this specific user.
+     *
      * @return conformation link which contains user specific data.
      */
     private String getConfirmUrl(final User user) {

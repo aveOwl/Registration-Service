@@ -1,7 +1,5 @@
 package com.registration.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,16 +9,17 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.persistence.NoResultException;
 
 /**
- * The MainControllerAdvice class provide a consistent response
- * when Exceptions are thrown from <code>@RequestMapping</code> Controller methods.
+ * <p>
+ *     The MainControllerAdvice class provide a consistent response
+ *     when Exceptions are thrown from <code>@RequestMapping</code> Controller methods.
+ * </p>
  */
 @ControllerAdvice
 public class MainControllerAdvice {
-    private static final Logger LOG = LoggerFactory.getLogger(MainControllerAdvice.class);
 
     /**
-     * Handles specific NoResultException that is thrown if user attempts to confirm registration
-     * with invalid confirmation link.
+     * Handles specific <code>NoResultException</code> that is thrown if user attempts
+     * to confirm registration with invalid confirmation link.
      *
      * @param e A NoResultException instance.
      * @return An Error page containing the Exception message and
@@ -29,11 +28,12 @@ public class MainControllerAdvice {
     @ExceptionHandler(NoResultException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ModelAndView handleNoResultException(final NoResultException e) {
-        return getDefaultErrorModel(HttpStatus.BAD_REQUEST, e);
+        return this.getDefaultErrorModel(HttpStatus.BAD_REQUEST, e);
     }
 
     /**
      * Handles <code>Exception</code> thrown from web service controller methods.
+     *
      * @param ex A <code>Exception</code> instance.
      * @return response with HTTP status code 500 and exception message.
      */
@@ -45,12 +45,13 @@ public class MainControllerAdvice {
 
     /**
      * Creates error model for error page view.
+     *
      * @param status response status for given exception.
      * @param e exception that needs to be handled.
      * @return complete error model for the view.
      */
     private ModelAndView getDefaultErrorModel(final HttpStatus status, final Exception e) {
-        ModelAndView model = new ModelAndView();
+        final ModelAndView model = new ModelAndView();
 
         final String desc = "There is no content available. " + e.getMessage();
 

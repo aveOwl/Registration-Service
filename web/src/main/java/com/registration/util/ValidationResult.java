@@ -8,20 +8,21 @@ import org.springframework.validation.FieldError;
 import javax.validation.constraints.Pattern;
 
 /**
- * Class FormValidationResult provides response
- * to {@link User} entity form validation.
+ * <p>
+ *     The ValidationResult class defines how response for {@link User} entity
+ *     form validation should be built.
+ * </p>
  */
 public class ValidationResult {
 
     /**
-     * If set to true user validation
-     * was successful.
+     * Indicates whether the user validation was successful.
      */
     private boolean success;
 
     /**
      * True: user email composed correctly.
-     * False: no email provided / provided email
+     * False: either no email provided or provided email
      * does not match {@link Email} well formed email structure.
      */
     private boolean invalidEmail;
@@ -38,9 +39,10 @@ public class ValidationResult {
     private String passwordViolationMessage;
 
     /**
-     * Constructs {@link ValidationResult} object with provided
-     * {@link BindingResult} which contains information about
-     * user validation according to constraints defined in {@link User} entity class.
+     * Constructs {@link ValidationResult} object with provided {@link BindingResult}
+     * which contains information about user validation according to constraints
+     * defined in {@link User} entity class.
+     *
      * @param bindingResult validation result.
      */
     public ValidationResult(final BindingResult bindingResult) {
@@ -49,10 +51,10 @@ public class ValidationResult {
         this.invalidEmail = bindingResult.hasFieldErrors("email");
         this.invalidPassword = bindingResult.hasFieldErrors("password");
 
-        StringBuilder emailMessageBuilder = new StringBuilder();
-        StringBuilder passwordMessageBuilder = new StringBuilder();
+        final StringBuilder emailMessageBuilder = new StringBuilder();
+        final StringBuilder passwordMessageBuilder = new StringBuilder();
 
-        // Build ConfirmationEmail Violation message.
+        // Build Email Violation message.
         if (this.invalidEmail) {
             for (FieldError error : bindingResult.getFieldErrors("email")) {
                 emailMessageBuilder.append(error.getDefaultMessage());

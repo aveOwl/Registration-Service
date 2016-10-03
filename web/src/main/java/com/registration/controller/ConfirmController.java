@@ -33,7 +33,7 @@ public class ConfirmController {
     public String confirm(@PathVariable final String code) {
         LOG.info("Attempting user confirmation...");
 
-        userService.confirm(code);
+        this.userService.confirm(code);
 
         return "redirect:/success";
     }

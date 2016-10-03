@@ -26,6 +26,9 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void create(final User user) {
         Assert.notNull(user, "User can't be null.");
@@ -40,6 +43,9 @@ public class UserServiceImpl implements UserService {
         LOG.debug("Persisted user entity: {}", savedUser);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void update(final User user) {
         Assert.notNull(user, "User can't be null.");
@@ -53,6 +59,9 @@ public class UserServiceImpl implements UserService {
         LOG.info("Updated user entity: {}", updatedUser);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<User> findByEmail(final String email) {
         Assert.notNull(email, "Email can't be null.");
@@ -63,6 +72,9 @@ public class UserServiceImpl implements UserService {
         return Optional.ofNullable(user);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void confirm(final String confirmationCode) {
         Assert.notNull(confirmationCode, "Confirmation code can't be null.");
@@ -78,6 +90,13 @@ public class UserServiceImpl implements UserService {
         LOG.debug("User: {} is confirmed.", confirmedUser);
     }
 
+    /**
+     * Decodes given confirmation code into array containing user email and password.
+     * Retrieves user's email from the array and returns it.
+     *
+     * @param confirmationCode confirmation code with encoded user data.
+     * @return user email.
+     */
     private String decodeEmail(final String confirmationCode) {
         try {
             final byte[] decodedData = Base64Utils.decodeFromString(confirmationCode);

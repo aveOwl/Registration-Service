@@ -47,7 +47,7 @@ public class ConfirmControllerTest {
     @Test
     public void shouldConfirmOnValidLink() throws Exception {
         // given
-        doNothing().when(userService).confirm(TEST_HASH);
+        doNothing().when(this.userService).confirm(TEST_HASH);
 
         // when
         this.mvc.perform(get(CONFIRMATION_URI + "/" + TEST_HASH))
@@ -55,7 +55,7 @@ public class ConfirmControllerTest {
                 .andExpect(redirectedUrl("/success"));
 
         // then
-        verify(userService, only()).confirm(TEST_HASH);
+        verify(this.userService, only()).confirm(TEST_HASH);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class ConfirmControllerTest {
     public void shouldRenderErrorPageWithBadRequestStatus() throws Exception {
         // given
         doThrow(new NoResultException(TEST_ERROR_MSG))
-                .when(userService).confirm(TEST_HASH);
+                .when(this.userService).confirm(TEST_HASH);
 
         // when
         this.mvc.perform(get(CONFIRMATION_URI + "/" + TEST_HASH))
@@ -80,6 +80,6 @@ public class ConfirmControllerTest {
                 .andExpect(model().attribute("description", containsString(TEST_ERROR_MSG)));
 
         // then
-        verify(userService, only()).confirm(TEST_HASH);
+        verify(this.userService, only()).confirm(TEST_HASH);
     }
 }
