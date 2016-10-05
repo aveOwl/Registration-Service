@@ -27,17 +27,14 @@ public class EmailBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(EmailBuilder.class);
     private static final String CONFIRM_URI = "http://localhost:8080/registration/confirm/"; // TODO deal with this
 
-    @Value("${spring.mail.email}")
-    private String senderEmail;
-
     @Value("${spring.mail.subject}")
     public String subject;
-
     @Value("${spring.freemarker.view-names}")
     public String templateName;
-
     @Value("${spring.freemarker.resources}")
     public String resources;
+    @Value("${spring.mail.email}")
+    private String senderEmail;
 
     private JavaMailSender mailSender;
     private FreeMarkerConfigurer configurer;
@@ -123,8 +120,7 @@ public class EmailBuilder {
      * Constructs confirmation email body for the given user,
      * providing email, password and confirmation URL.
      *
-     * @return map containing key-value pairs for
-     * email, password, and confirmation URL.
+     * @return map containing key-value pairs for email, password, and confirmation URL.
      */
     private Map<String, String> getEmailModel(final User user) {
         final Map<String, String> model = new HashMap<>();

@@ -21,11 +21,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Optional;
 
 import static com.registration.Points.DUPLICATE_EMAIL_MSG;
-import static com.registration.Points.TEST_ERROR_MSG;
 import static com.registration.Points.INVALID_EMAIL;
 import static com.registration.Points.INVALID_EMAIL_MSG;
 import static com.registration.Points.INVALID_PASSWORD;
 import static com.registration.Points.INVALID_PASSWORD_MSG;
+import static com.registration.Points.TEST_ERROR_MSG;
 import static com.registration.Points.VALID_EMAIL;
 import static com.registration.Points.VALID_PASSWORD;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -51,30 +51,27 @@ public class RegisterControllerTest {
 
     @Autowired
     private MockMvc mvc;
-
     @MockBean
     private UserService userService;
-
     @MockBean
     private MailService mailService;
 
     private String inputJson;
-
     private User user;
 
     @Before
     public void setUp() throws Exception {
         this.mvc = MockMvcBuilders.standaloneSetup(
-                new RegisterController(this.userService, this.mailService))
-                .setControllerAdvice(new MainControllerAdvice())
+                new RegisterController(userService, mailService))
+                .setControllerAdvice(new GlobalControllerAdvice())
                 .build();
 
-        this.user = new User(VALID_EMAIL, VALID_PASSWORD);
+        user = new User(VALID_EMAIL, VALID_PASSWORD);
     }
 
     @After
     public void tearDown() throws Exception {
-        this.user = null;
+        user = null;
     }
 
     @Test
@@ -97,19 +94,19 @@ public class RegisterControllerTest {
     @Test
     public void shouldNotRegisterUserOnDuplicateEmail() throws Exception {
         // given
-        given(this.userService.findByEmail(VALID_EMAIL))
-                .willReturn(Optional.of(this.user));
+        given(userService.findByEmail(VALID_EMAIL))
+                .willReturn(Optional.of(user));
 
-        this.user.setEmail(VALID_EMAIL);
-        this.user.setPassword(VALID_PASSWORD);
+        user.setEmail(VALID_EMAIL);
+        user.setPassword(VALID_PASSWORD);
 
-        this.inputJson = mapToJson(this.user);
+        inputJson = mapToJson(user);
 
         // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(this.inputJson))
+                .content(inputJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(true)))
@@ -118,23 +115,23 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
         // then
-        verify(this.userService, never()).create(this.user);
-        verify(this.mailService, never()).sendEmail(this.user);
+        verify(userService, never()).create(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     @Test
     public void shouldNotRegisterUserOnInvalidEmail() throws Exception {
         // given
-        this.user.setEmail(INVALID_EMAIL);
-        this.user.setPassword(VALID_PASSWORD);
+        user.setEmail(INVALID_EMAIL);
+        user.setPassword(VALID_PASSWORD);
 
-        this.inputJson = mapToJson(this.user);
+        inputJson = mapToJson(user);
 
         // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(this.inputJson))
+                .content(inputJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(true)))
@@ -143,23 +140,23 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
         // then
-        verify(this.userService, never()).create(this.user);
-        verify(this.mailService, never()).sendEmail(this.user);
+        verify(userService, never()).create(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     @Test
     public void shouldNotRegisterUserOnInvalidPassword() throws Exception {
         // given
-        this.user.setEmail(VALID_EMAIL);
-        this.user.setPassword(INVALID_PASSWORD);
+        user.setEmail(VALID_EMAIL);
+        user.setPassword(INVALID_PASSWORD);
 
-        this.inputJson = mapToJson(this.user);
+        inputJson = mapToJson(user);
 
         // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(this.inputJson))
+                .content(inputJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(false)))
@@ -168,23 +165,23 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", is(INVALID_PASSWORD_MSG)));
 
         // then
-        verify(this.userService, never()).create(this.user);
-        verify(this.mailService, never()).sendEmail(this.user);
+        verify(userService, never()).create(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     @Test
     public void shouldNotRegisterUserOnInvalidPasswordAndInvalidEmail() throws Exception {
         // given
-        this.user.setEmail(INVALID_EMAIL);
-        this.user.setPassword(INVALID_PASSWORD);
+        user.setEmail(INVALID_EMAIL);
+        user.setPassword(INVALID_PASSWORD);
 
-        this.inputJson = mapToJson(this.user);
+        inputJson = mapToJson(user);
 
         // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(this.inputJson))
+                .content(inputJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.invalidEmail", is(true)))
@@ -193,26 +190,26 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", is(INVALID_PASSWORD_MSG)));
 
         // then
-        verify(this.userService, never()).create(this.user);
-        verify(this.mailService, never()).sendEmail(this.user);
+        verify(userService, never()).create(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     @Test
     public void shouldRegisterUserOnValidEmailAndPassword() throws Exception {
         // given
-        this.user.setEmail(VALID_EMAIL);
-        this.user.setPassword(VALID_PASSWORD);
+        user.setEmail(VALID_EMAIL);
+        user.setPassword(VALID_PASSWORD);
 
-        given(this.userService.findByEmail(VALID_EMAIL))
+        given(userService.findByEmail(VALID_EMAIL))
                 .willReturn(Optional.empty());
 
-        this.inputJson = mapToJson(this.user);
+        inputJson = mapToJson(user);
 
         // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(this.inputJson))
+                .content(inputJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.invalidEmail", is(false)))
@@ -221,36 +218,36 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$.passwordViolationMessage", isEmptyString()));
 
         // then
-        verify(this.userService, atLeastOnce()).create(this.user);
-        verify(this.mailService, atLeastOnce()).sendEmail(this.user);
+        verify(userService, atLeastOnce()).create(user);
+        verify(mailService, atLeastOnce()).sendEmail(user);
     }
 
     @Test
     public void shouldRenderErrorPageWithInternalServerErrorStatus() throws Exception {
         // given
-        this.user.setEmail(VALID_EMAIL);
-        this.user.setPassword(VALID_PASSWORD);
+        user.setEmail(VALID_EMAIL);
+        user.setPassword(VALID_PASSWORD);
 
-        given(this.userService.findByEmail(this.user.getEmail()))
+        given(userService.findByEmail(user.getEmail()))
                 .willReturn(Optional.empty());
 
-        this.inputJson = mapToJson(this.user);
+        inputJson = mapToJson(user);
 
         doThrow(new IllegalArgumentException(TEST_ERROR_MSG))
-                .when(this.userService).create(this.user);
+                .when(userService).create(user);
 
         // when
         this.mvc.perform(post(REGISTRATION_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(this.inputJson))
+                .content(inputJson))
                 .andExpect(status().isInternalServerError())
                 .andExpect(view().name("error"))
                 .andExpect(model().attribute("description", containsString(TEST_ERROR_MSG)));
 
         // then
-        verify(this.userService, atLeastOnce()).create(this.user);
-        verify(this.mailService, never()).sendEmail(this.user);
+        verify(userService, atLeastOnce()).create(user);
+        verify(mailService, never()).sendEmail(user);
     }
 
     /**

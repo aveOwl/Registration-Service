@@ -40,14 +40,14 @@ public class ConfirmControllerTest {
     @Before
     public void setUp() throws Exception {
         this.mvc = MockMvcBuilders.standaloneSetup(new ConfirmController(this.userService))
-                .setControllerAdvice(new MainControllerAdvice())
+                .setControllerAdvice(new GlobalControllerAdvice())
                 .build();
     }
 
     @Test
     public void shouldConfirmOnValidLink() throws Exception {
         // given
-        doNothing().when(this.userService).confirm(TEST_HASH);
+        doNothing().when(userService).confirm(TEST_HASH);
 
         // when
         this.mvc.perform(get(CONFIRMATION_URI + "/" + TEST_HASH))
@@ -55,7 +55,7 @@ public class ConfirmControllerTest {
                 .andExpect(redirectedUrl("/success"));
 
         // then
-        verify(this.userService, only()).confirm(TEST_HASH);
+        verify(userService, only()).confirm(TEST_HASH);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class ConfirmControllerTest {
     public void shouldRenderErrorPageWithBadRequestStatus() throws Exception {
         // given
         doThrow(new NoResultException(TEST_ERROR_MSG))
-                .when(this.userService).confirm(TEST_HASH);
+                .when(userService).confirm(TEST_HASH);
 
         // when
         this.mvc.perform(get(CONFIRMATION_URI + "/" + TEST_HASH))
@@ -80,6 +80,6 @@ public class ConfirmControllerTest {
                 .andExpect(model().attribute("description", containsString(TEST_ERROR_MSG)));
 
         // then
-        verify(this.userService, only()).confirm(TEST_HASH);
+        verify(userService, only()).confirm(TEST_HASH);
     }
 }

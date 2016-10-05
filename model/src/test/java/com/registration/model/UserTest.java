@@ -12,7 +12,12 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.Set;
 
-import static com.registration.Points.*;
+import static com.registration.Points.INVALID_EMAIL;
+import static com.registration.Points.INVALID_EMAIL_MSG;
+import static com.registration.Points.INVALID_PASSWORD;
+import static com.registration.Points.INVALID_PASSWORD_MSG;
+import static com.registration.Points.VALID_EMAIL;
+import static com.registration.Points.VALID_PASSWORD;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -100,9 +105,9 @@ public class UserTest {
         assertThat("confirmed users should be equal", valid1.equals(valid2), is(true));
     }
 
-    private Set<ConstraintViolation<User>> validateClass(User user) {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+    private Set<ConstraintViolation<User>> validateClass(final User user) {
+        final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        final Validator validator = factory.getValidator();
         return validator.validate(user);
     }
 }

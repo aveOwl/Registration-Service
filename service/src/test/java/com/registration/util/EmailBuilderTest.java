@@ -36,36 +36,26 @@ import static org.mockito.Mockito.verify;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = EmailBuilder.class)
 public class EmailBuilderTest {
-    @Autowired
-    private EmailBuilder emailBuilder;
-
-    @MockBean
-    private JavaMailSender mailSender;
-
-    @MockBean
-    private FreeMarkerConfigurer configurer;
-
-    @MockBean
-    private MimeMessage message;
-
-    @MockBean
-    private MimeMessageHelper helper;
-
-    @MockBean
-    private Configuration configuration;
-
-    @MockBean
-    private Template template;
-
-    @MockBean
-    private MimeMessageHelperProvider helperProvider;
-
-    @Mock
-    private Map<String, String> map;
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
+    @Autowired
+    private EmailBuilder emailBuilder;
+    @MockBean
+    private JavaMailSender mailSender;
+    @MockBean
+    private FreeMarkerConfigurer configurer;
+    @MockBean
+    private MimeMessage message;
+    @MockBean
+    private MimeMessageHelper helper;
+    @MockBean
+    private Configuration configuration;
+    @MockBean
+    private Template template;
+    @MockBean
+    private MimeMessageHelperProvider helperProvider;
+    @Mock
+    private Map<String, String> map;
     private User user;
 
     @Before

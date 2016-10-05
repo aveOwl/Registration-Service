@@ -10,7 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>Registration-Service.model</artifactId>
+    <artifactId>Registration-Service-Model</artifactId>
     <packaging>jar</packaging>
 
     <name>Model</name>

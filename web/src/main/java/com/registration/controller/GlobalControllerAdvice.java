@@ -9,21 +9,18 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.persistence.NoResultException;
 
 /**
- * <p>
- *     The MainControllerAdvice class provide a consistent response
- *     when Exceptions are thrown from <code>@RequestMapping</code> Controller methods.
- * </p>
+ * The MainControllerAdvice class provide a consistent response
+ * when Exceptions are thrown from <code>@RequestMapping</code> Controller methods.
  */
 @ControllerAdvice
-public class MainControllerAdvice {
+public class GlobalControllerAdvice {
 
     /**
      * Handles specific <code>NoResultException</code> that is thrown if user attempts
      * to confirm registration with invalid confirmation link.
      *
      * @param e A NoResultException instance.
-     * @return An Error page containing the Exception message and
-     * a HTTP status code 400, bad request.
+     * @return An Error page containing the Exception message and a HTTP status code 400, bad request.
      */
     @ExceptionHandler(NoResultException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -47,7 +44,7 @@ public class MainControllerAdvice {
      * Creates error model for error page view.
      *
      * @param status response status for given exception.
-     * @param e exception that needs to be handled.
+     * @param e      exception that needs to be handled.
      * @return complete error model for the view.
      */
     private ModelAndView getDefaultErrorModel(final HttpStatus status, final Exception e) {

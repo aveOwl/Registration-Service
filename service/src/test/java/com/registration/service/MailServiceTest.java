@@ -33,24 +33,18 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest(classes = MailServiceImpl.class)
 public class MailServiceTest {
 
-    @Autowired
-    private MailService mailService;
-
-    @MockBean
-    private EmailBuilder emailBuilder;
-
-    @MockBean
-    private MimeMessage email;
-
-    @MockBean
-    private JavaMailSender mailSender;
-
-    @Captor
-    private ArgumentCaptor<User> userCaptor;
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
+    @Autowired
+    private MailService mailService;
+    @MockBean
+    private EmailBuilder emailBuilder;
+    @MockBean
+    private MimeMessage email;
+    @MockBean
+    private JavaMailSender mailSender;
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
     private User user;
 
     @Before

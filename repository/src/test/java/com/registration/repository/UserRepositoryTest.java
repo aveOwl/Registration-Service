@@ -24,13 +24,11 @@ import static org.junit.Assert.assertThat;
 @EntityScan(basePackages = "com.registration.model")
 public class UserRepositoryTest {
 
+    private User user;
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private TestEntityManager entityManager;
-
-    private static User user;
 
     @Before
     public void setUp() throws Exception {
@@ -44,9 +42,9 @@ public class UserRepositoryTest {
 
     @Test
     public void shouldCreateUser() throws Exception {
-        this.entityManager.persistAndFlush(user);
+        entityManager.persistAndFlush(user);
 
-        User user = this.userRepository.findByEmail(VALID_EMAIL);
+        User user = userRepository.findByEmail(VALID_EMAIL);
 
         assertThat("valid user email", user.getEmail(), is(VALID_EMAIL));
         assertThat("valid user password", user.getPassword(), is(VALID_PASSWORD));
@@ -54,16 +52,16 @@ public class UserRepositoryTest {
 
     @Test
     public void shouldFindByEmail() throws Exception {
-        this.entityManager.persistAndFlush(user);
+        entityManager.persistAndFlush(user);
 
-        User byEmail = this.userRepository.findByEmail(VALID_EMAIL);
+        User byEmail = userRepository.findByEmail(VALID_EMAIL);
 
         assertThat("valid user", byEmail, is(user));
     }
 
     @Test
     public void shouldReturnNullOnNonExistingUser() throws Exception {
-        User byEmail = this.userRepository.findByEmail(VALID_EMAIL);
+        User byEmail = userRepository.findByEmail(VALID_EMAIL);
 
         assertNull("should be null value if user don't exist", byEmail);
     }

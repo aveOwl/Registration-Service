@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -54,7 +53,7 @@ public class RegisterController {
         LOG.info("Attempting user registration...");
 
         if (!bindingResult.hasErrors() &&
-            this.userService.findByEmail(user.getEmail()).isPresent()) {
+                this.userService.findByEmail(user.getEmail()).isPresent()) {
             bindingResult.addError(new FieldError("user", "email", DUPLICATE_EMAIL_MSG));
         }
 

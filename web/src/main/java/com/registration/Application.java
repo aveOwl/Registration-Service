@@ -14,6 +14,10 @@ import org.springframework.web.servlet.resource.VersionResourceResolver;
 @EnableAsync
 public class Application extends WebMvcConfigurerAdapter {
 
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
     @Bean
     public ResourceUrlEncodingFilter filter() {
         return new ResourceUrlEncodingFilter();
@@ -29,9 +33,5 @@ public class Application extends WebMvcConfigurerAdapter {
                                 .addFixedVersionStrategy("1.0.SNAPSHOT", "/**/*.js") // for .js files prepend with version
                                 .addContentVersionStrategy("/**")) // for css files - hash strategy
                 .addTransformer(new AppCacheManifestTransformer()); // code can be used offline
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
     }
 }

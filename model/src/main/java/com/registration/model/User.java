@@ -2,15 +2,18 @@ package com.registration.model;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Pattern;
 
-import static com.registration.Points.*;
+import static com.registration.Points.EMPTY_EMAIL_MSG;
+import static com.registration.Points.EMPTY_PASSWORD_MSG;
+import static com.registration.Points.INVALID_EMAIL_MSG;
+import static com.registration.Points.INVALID_PASSWORD_MSG;
 
 @Entity
 @Table(name = "users")
@@ -49,7 +52,8 @@ public class User {
     @Column(name = "is_confirmed")
     private boolean isConfirmed;
 
-    public User() {}
+    public User() {
+    }
 
     public User(final String email, final String password) {
         this.email = email;
@@ -57,7 +61,7 @@ public class User {
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(final Long id) {
@@ -65,7 +69,7 @@ public class User {
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(final String email) {
@@ -73,7 +77,7 @@ public class User {
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public void setPassword(final String password) {
@@ -81,11 +85,11 @@ public class User {
     }
 
     public boolean isConfirmed() {
-        return isConfirmed;
+        return this.isConfirmed;
     }
 
     public void setConfirmed(final boolean confirmed) {
-        isConfirmed = confirmed;
+        this.isConfirmed = confirmed;
     }
 
     @Override
@@ -95,8 +99,8 @@ public class User {
         if (other.getClass() != this.getClass()) return false;
         User that = (User) other;
         return (this.email.equals(that.email)) &&
-               (this.password.equals(that.password) &&
-                this.isConfirmed == that.isConfirmed);
+                (this.password.equals(that.password) &&
+                        this.isConfirmed == that.isConfirmed);
     }
 
     @Override

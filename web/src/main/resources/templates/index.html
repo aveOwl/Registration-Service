@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html ng-app="application" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" ng-app="application">
 <head>
     <title>Registration Service</title>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/dist/css/bootstrap.css}"/>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
     <script th:src="@{/webjars/angular/1.5.8/angular.min.js}"></script>
@@ -14,7 +14,7 @@
 <div class="container">
     <h1>Register</h1>
 </div>
-<hr />
+<hr/>
 
 <!-- Home Section-->
 <div class="container col-lg-offset-9" ng-show="showRegister">
@@ -35,14 +35,16 @@
             </div>
             <!--ConfirmationEmail Field-->
             <div class="form-group" ng-class="{'has-error': result.invalidEmail}">
-                <label class="sr-only"  for="email">Email Address</label>
-                <input name="email" id="email" placeholder="Email Address" class="form-control" type="text" ng-model="user.email" />
+                <label class="sr-only" for="email">Email Address</label>
+                <input name="email" id="email" placeholder="Email Address" class="form-control" type="text"
+                       ng-model="user.email"/>
                 <small class="form-text text-muted">We'll never share your email with anyone else.</small>
             </div>
             <!--Password Field-->
             <div class="form-group" ng-class="{'has-error': result.invalidPassword}">
                 <label class="sr-only" for="password">Password</label>
-                <input name="password" id="password" placeholder="Password" class="form-control" type="password" ng-model="user.password" />
+                <input name="password" id="password" placeholder="Password" class="form-control" type="password"
+                       ng-model="user.password"/>
             </div>
         </div>
         <!--Submit Button Field-->
@@ -57,7 +59,7 @@
     <h1>Check Your Email !</h1>
 </div>
 
-<hr />
+<hr/>
 <footer class="text-center">
     <div class="container">
         <p class="text-muted col-lg">&copy; AveOwl 2016</p>

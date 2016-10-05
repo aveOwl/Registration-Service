@@ -20,7 +20,6 @@ import org.springframework.util.Base64Utils;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
-
 import java.util.Optional;
 
 import static com.registration.Points.VALID_EMAIL;
@@ -37,19 +36,14 @@ import static org.mockito.Mockito.only;
 @SpringBootTest(classes = UserServiceImpl.class)
 public class UserServiceTest {
     private static final Long TEST_ID = 99L;
-
-    @Autowired
-    private UserService userService;
-
-    @MockBean
-    private UserRepository userRepository;
-
-    @Captor
-    private ArgumentCaptor<User> userCaptor;
-
     @Rule
     public ExpectedException expected = ExpectedException.none();
-
+    @Autowired
+    private UserService userService;
+    @MockBean
+    private UserRepository userRepository;
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
     private User user;
 
     @Before

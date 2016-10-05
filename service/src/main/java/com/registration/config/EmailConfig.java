@@ -14,27 +14,22 @@ import java.util.Properties;
 @Component
 @PropertySource("classpath:application-mail.properties")
 public class EmailConfig {
-
     private static final Logger LOG = LoggerFactory.getLogger(EmailConfig.class);
-
-    @Value("${spring.mail.host}")
-    private String mailHost;
-
-    @Value("${spring.mail.port}")
-    private String mailPort;
-
-    @Value("${spring.mail.email}")
-    private String senderEmail;
-
-    @Value("${spring.mail.password}")
-    private String senderPassword;
 
     @Value("${spring.freemarker.template-loader-path}")
     public String templatePath;
+    @Value("${spring.mail.host}")
+    private String mailHost;
+    @Value("${spring.mail.port}")
+    private String mailPort;
+    @Value("${spring.mail.email}")
+    private String senderEmail;
+    @Value("${spring.mail.password}")
+    private String senderPassword;
 
     @Bean
     public JavaMailSenderImpl mailSender() {
-        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        final JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 
         javaMailSender.setHost(this.mailHost);
         javaMailSender.setPort(Integer.valueOf(this.mailPort));
@@ -56,7 +51,7 @@ public class EmailConfig {
 
     @Bean
     public FreeMarkerConfigurer freeMarkerConfigurer() {
-        FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
+        final FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
 
         freeMarkerConfigurer.setTemplateLoaderPath(this.templatePath);
 
