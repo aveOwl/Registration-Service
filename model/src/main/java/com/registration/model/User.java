@@ -93,24 +93,25 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == this) return true;
-        if (other == null) return false;
-        if (other.getClass() != this.getClass()) return false;
-        User that = (User) other;
-        return (this.email.equals(that.email)) &&
-                (this.password.equals(that.password) &&
-                        this.isConfirmed == that.isConfirmed);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+
+        User user = (User) o;
+
+        if (isConfirmed != user.isConfirmed) return false;
+        if (id != null ? ! id.equals(user.id) : user.id != null) return false;
+        if (! email.equals(user.email)) return false;
+        return password.equals(user.password);
     }
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        if (email != null && password != null) {
-            hash = 31 * hash + email.hashCode();
-            hash = 31 * hash + password.hashCode();
-        }
-        return hash;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + email.hashCode();
+        result = 31 * result + password.hashCode();
+        result = 31 * result + (isConfirmed ? 1 : 0);
+        return result;
     }
 
     @Override
