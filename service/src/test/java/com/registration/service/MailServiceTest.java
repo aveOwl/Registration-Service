@@ -2,7 +2,7 @@ package com.registration.service;
 
 import com.registration.model.User;
 import com.registration.service.impl.MailServiceImpl;
-import com.registration.util.EmailBuilder;
+import com.registration.util.impl.EmailBuilderImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,7 +38,7 @@ public class MailServiceTest {
     @Autowired
     private MailService mailService;
     @MockBean
-    private EmailBuilder emailBuilder;
+    private EmailBuilderImpl emailBuilder;
     @MockBean
     private MimeMessage email;
     @MockBean
@@ -53,6 +53,7 @@ public class MailServiceTest {
     }
 
     @After
+
     public void tearDown() throws Exception {
         user = null;
     }

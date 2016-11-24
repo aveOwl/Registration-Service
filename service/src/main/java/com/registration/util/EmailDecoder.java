@@ -8,6 +8,7 @@ public interface EmailDecoder {
 
     /**
      * Translates a single confirmation code into user email address.
+     *
      * @param code confirmation code.
      * @return user email address.
      */

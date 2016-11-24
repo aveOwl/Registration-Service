@@ -1,5 +1,6 @@
-package com.registration.util;
+package com.registration.util.impl;
 
+import com.registration.util.EmailDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 
@@ -7,6 +8,7 @@ import javax.persistence.NoResultException;
 
 @Service
 public class EmailDecoderImpl implements EmailDecoder {
+
     /**
      * Decodes given confirmation code into array containing user email and password.
      * Retrieves user's email from the array and returns it.

@@ -21,8 +21,8 @@ public class MailServiceImpl implements MailService {
     private JavaMailSender mailSender;
 
     @Autowired
-    public MailServiceImpl(final EmailBuilder emailBuilder,
-                           final JavaMailSender mailSender) {
+    public MailServiceImpl(EmailBuilder emailBuilder,
+                           JavaMailSender mailSender) {
         this.emailBuilder = emailBuilder;
         this.mailSender = mailSender;
     }
@@ -32,10 +32,10 @@ public class MailServiceImpl implements MailService {
      */
     @Override
     @Async
-    public void sendEmail(final User user) {
+    public void sendEmail(User user) {
         Assert.notNull(user, "User can't be null.");
 
-        final MimeMessage email = this.emailBuilder.createEmail(user);
+        MimeMessage email = this.emailBuilder.createEmail(user);
 
         this.mailSender.send(email);
 
