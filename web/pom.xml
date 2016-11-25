@@ -16,7 +16,7 @@
 
     <properties>
         <angular.version>1.5.8</angular.version>
-        <bootstrap.version>4.0.0-alpha.5</bootstrap.version>
+        <bootstrap.version>3.3.7</bootstrap.version>
         <docker.image.prefix>aveowl</docker.image.prefix>
         <docker.image.name>registration-service</docker.image.name>
         <docker.plugin.version>0.4.11</docker.plugin.version>
