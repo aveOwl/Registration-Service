@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -28,38 +28,34 @@ public class RegisterController {
     private MailService mailService;
 
     @Autowired
-    public RegisterController(final UserService userService,
-                              final MailService mailService) {
+    public RegisterController(final UserService userService, final MailService mailService) {
         this.userService = userService;
         this.mailService = mailService;
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @GetMapping("/")
     public String redirect() {
         LOG.info("Redirecting to home page...");
         return "redirect:/registration";
     }
 
-    @RequestMapping(value = "/registration", method = RequestMethod.GET)
+    @GetMapping("/registration")
     public ModelAndView home() {
         LOG.info("Rendering home page...");
         return new ModelAndView("index");
     }
 
-    @RequestMapping(value = "/registration", method = RequestMethod.POST)
+    @PostMapping("/registration")
     @ResponseBody
-    public ValidationResult register(final @Valid @RequestBody User user,
-                                     final BindingResult bindingResult) {
+    public ValidationResult register(@Valid @RequestBody User user, BindingResult bindingResult) {
         LOG.info("Attempting user registration...");
 
-        if (!bindingResult.hasErrors() &&
-                this.userService.findByEmail(user.getEmail()).isPresent()) {
+        if (! bindingResult.hasErrors() && this.userService.findByEmail(user.getEmail()) != null) {
             bindingResult.addError(new FieldError("user", "email", DUPLICATE_EMAIL_MSG));
         }
 
-        if (!bindingResult.hasErrors()) {
-            LOG.debug("Input: email = {}, password = {} is verified",
-                    user.getEmail(), user.getPassword());
+        if (! bindingResult.hasErrors()) {
+            LOG.debug("Input: email = {}, password = {} is verified", user.getEmail(), user.getPassword());
             this.userService.create(user);
             this.mailService.sendEmail(user);
         } else {

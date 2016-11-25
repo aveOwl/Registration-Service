@@ -4,7 +4,7 @@
 
 <#assign picture_resource = "cid:mail-logo" />
 
-<img src=${picture_resource}alt="mailPic" style="align-content: center; width: 200px; height: 200px"/>
+<img src=${picture_resource} alt="mailPic" style="align-content: center; width: 200px; height: 200px"/>
 
 <div>
     <p>
