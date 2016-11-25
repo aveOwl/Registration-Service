@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.0.RELEASE</version>
+        <version>1.4.2.RELEASE</version>
     </parent>
 
     <groupId>Registration-Service</groupId>
@@ -21,6 +21,8 @@
         <java.version>1.8</java.version>
         <jacoco.plugin.version>0.7.4.201502262128</jacoco.plugin.version>
         <coveralls.plugin.version>4.2.0</coveralls.plugin.version>
+        <surefire.plugin.version>2.18.1</surefire.plugin.version>
+        <gmavenplus.plugin.version>1.5</gmavenplus.plugin.version>
     </properties>
 
     <modules>
@@ -56,6 +58,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
+            <version>2.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.spockframework</groupId>
@@ -70,7 +73,7 @@
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
-            <version>3.1</version>
+            <version>3.2.4</version>
         </dependency>
     </dependencies>
 
@@ -124,6 +127,30 @@
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.plugin.version}</version>
+                <configuration>
+                    <useFile>false</useFile>
+                    <includes>
+                        <include>**/*Spec.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>${gmavenplus.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
