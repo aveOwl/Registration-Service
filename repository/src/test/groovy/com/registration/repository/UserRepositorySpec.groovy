@@ -7,12 +7,14 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static com.registration.Points.*
 
 @ContextConfiguration(classes = UserRepository)
 @DataJpaTest(showSql = true)
 @EntityScan(basePackages = "com.registration.model")
+@Unroll
 class UserRepositorySpec extends Specification {
     @Autowired
     UserRepository userRepository

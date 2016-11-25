@@ -4,6 +4,7 @@ import com.registration.service.UserService
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import javax.persistence.NoResultException
 
@@ -13,6 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest(ConfirmController)
+@Unroll
 class ConfirmControllerSpec extends Specification {
     def confirmation_uri = "/registration/confirm"
     def test_hash = "test-hash"

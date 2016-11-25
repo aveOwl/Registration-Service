@@ -6,7 +6,9 @@ import com.registration.util.MimeMessageHelperProvider
 import org.springframework.core.io.Resource
 import org.springframework.mail.javamail.MimeMessageHelper
 import spock.lang.Specification
+import spock.lang.Unroll
 
+@Unroll
 class EmailBuilderSpec extends Specification {
     def configurer = Mock(EmailConfigurer)
     def provider = Mock(MimeMessageHelperProvider)
