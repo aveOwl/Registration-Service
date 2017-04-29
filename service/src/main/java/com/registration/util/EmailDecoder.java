@@ -3,6 +3,8 @@ package com.registration.util;
 /**
  * The EmailDecoder interface defines how a confirmation
  * code should be translated into user email.
+ *
+ * @author Bohdan Bachkala
  */
 public interface EmailDecoder {
 

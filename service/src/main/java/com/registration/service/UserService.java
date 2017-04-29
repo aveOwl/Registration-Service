@@ -5,6 +5,8 @@ import com.registration.model.User;
 /**
  * The UserService interface defines all public business behaviours
  * for operations with {@link User} entities.
+ *
+ * @author Bohdan Bachkala
  */
 public interface UserService {
 

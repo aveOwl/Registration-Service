@@ -3,14 +3,14 @@ package com.registration.util.impl;
 import com.registration.model.User;
 import com.registration.util.EmailConfigurer;
 import freemarker.template.Template;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.mail.MailPreparationException;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.Base64Utils;
@@ -21,8 +21,9 @@ import java.util.Map;
 
 @Service
 @PropertySource("classpath:application-mail.properties")
+@Slf4j
+@RequiredArgsConstructor
 public class EmailConfigurerImpl implements EmailConfigurer {
-    private static Logger LOG = LoggerFactory.getLogger(EmailBuilderImpl.class);
     private static String CONFIRM_URI = "http://localhost:8080/registration/confirm/"; // TODO deal with this
 
     @Value("${spring.freemarker.view-names}")
@@ -30,27 +31,17 @@ public class EmailConfigurerImpl implements EmailConfigurer {
     @Value("${spring.freemarker.resources}")
     public String resources;
 
-    private FreeMarkerConfigurer configurer;
-
-    @Autowired
-    public EmailConfigurerImpl(FreeMarkerConfigurer configurer) {
-        this.configurer = configurer;
-    }
+    private final FreeMarkerConfigurer configurer;
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @SneakyThrows
     public String getEmailBody(User user) {
-        try {
-            String emailBody = this.constructEmailBody(user);
-
-            LOG.debug("Constructing email body for User: {}", user);
-
-            return emailBody;
-        } catch (Exception e) {
-            throw new MailPreparationException("Failed to construct email body.", e);
-        }
+        val emailBody = this.constructEmailBody(user);
+        log.debug("Constructing email body for User: {}", user);
+        return emailBody;
     }
 
     @Override
@@ -65,9 +56,9 @@ public class EmailConfigurerImpl implements EmailConfigurer {
      * @throws Exception on error.
      */
     private String constructEmailBody(User user) throws Exception {
-        Template template = this.configurer.createConfiguration().getTemplate(this.templateName);
+        val template = this.configurer.createConfiguration().getTemplate(this.templateName);
 
-        Map<String, String> model = this.getEmailModel(user);
+        val model = this.getEmailModel(user);
 
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -85,8 +76,8 @@ public class EmailConfigurerImpl implements EmailConfigurer {
         model.put("password", this.getStarsPassword(user));
         model.put("confirmUrl", this.getConfirmUrl(user));
 
-        LOG.debug("Constructing model: {email={}, password={}, confirmUrl={}}", user.getEmail(), this.getStarsPassword(user), this.getConfirmUrl(user));
-
+        log.debug("Constructing model: {email={}, password={}, confirmUrl={}}",
+                user.getEmail(), this.getStarsPassword(user), this.getConfirmUrl(user));
         return model;
     }
 
@@ -97,7 +88,7 @@ public class EmailConfigurerImpl implements EmailConfigurer {
      * @return a string representing partly hidden user password.
      */
     private String getStarsPassword(User user) {
-        char[] array = user.getEmail().toCharArray();
+        val array = user.getEmail().toCharArray();
         for (int i = 0; i < array.length - 2; i++) {
             array[i] = '*';
         }

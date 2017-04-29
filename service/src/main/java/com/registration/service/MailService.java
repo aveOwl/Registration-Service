@@ -6,6 +6,8 @@ import com.registration.model.User;
  * The MailService interface defines all public business behaviours
  * associated with email operations such as configuring,
  * composing and transmitting an email for {@link User} entities.
+ *
+ * @author Bohdan Bachkala
  */
 public interface MailService {
 

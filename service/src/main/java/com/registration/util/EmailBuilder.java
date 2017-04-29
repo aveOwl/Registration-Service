@@ -7,6 +7,8 @@ import javax.mail.internet.MimeMessage;
 /**
  * The EmailBuilder interface defines how an email should be build
  * for specified {@link User}.
+ *
+ * @author Bohdan Bachkala
  */
 public interface EmailBuilder {
 

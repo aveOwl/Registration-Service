@@ -4,9 +4,9 @@ import com.registration.model.User;
 import com.registration.repository.UserRepository;
 import com.registration.service.UserService;
 import com.registration.util.EmailDecoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -14,18 +14,11 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
-
-    private UserRepository userRepository;
-    private EmailDecoder emailDecoder;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository,
-                           EmailDecoder emailDecoder) {
-        this.userRepository = userRepository;
-        this.emailDecoder = emailDecoder;
-    }
+    private final UserRepository userRepository;
+    private final EmailDecoder emailDecoder;
 
     /**
      * {@inheritDoc}
@@ -35,13 +28,11 @@ public class UserServiceImpl implements UserService {
         Assert.notNull(user, "User can't be null.");
 
         if (user.getId() != null) {
-            LOG.error("Attempted to create a User object, but id attribute was not null.");
             throw new EntityExistsException(
                     "Cannot create new User with supplied id. The id attribute must be null.");
         }
-
-        User savedUser = this.userRepository.save(user);
-        LOG.debug("Persisted user entity: {}", savedUser);
+        val savedUser = this.userRepository.save(user);
+        log.debug("Persisted user entity: {}", savedUser);
     }
 
     /**
@@ -52,12 +43,10 @@ public class UserServiceImpl implements UserService {
         Assert.notNull(user, "User can't be null.");
 
         if (user.getId() == null) {
-            LOG.error("Attempted to update a User object, but id attribute was null.");
             throw new EntityNotFoundException("Cannot perform update. The id attribute can't be null.");
         }
-
-        User updatedUser = this.userRepository.save(user);
-        LOG.info("Updated user entity: {}", updatedUser);
+        val updatedUser = this.userRepository.save(user);
+        log.info("Updated user entity: {}", updatedUser);
     }
 
     /**
@@ -66,10 +55,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByEmail(final String email) {
         Assert.notNull(email, "Email can't be null.");
-
-        User user = this.userRepository.findByEmail(email);
-
-        LOG.debug("User entity: {} fetched by email: {}", user, email);
+        val user = this.userRepository.findByEmail(email);
+        log.debug("User entity: {} fetched by email: {}", user, email);
         return user;
     }
 
@@ -80,12 +67,11 @@ public class UserServiceImpl implements UserService {
     public void confirm(final String confirmationCode) {
         Assert.notNull(confirmationCode, "Confirmation code can't be null.");
 
-        String email = this.emailDecoder.decode(confirmationCode);
-        User user = this.findByEmail(email);
+        val email = this.emailDecoder.decode(confirmationCode);
+        val user = this.findByEmail(email);
 
         user.setConfirmed(true);
         this.update(user);
-
-        LOG.debug("User: {} is confirmed.", user);
+        log.debug("User: {} is confirmed.", user);
     }
 }

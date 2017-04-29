@@ -7,6 +7,8 @@ import javax.mail.MessagingException;
 /**
  * The MimeMessageHelperProvider interface defines how an instance
  * of {@link MimeMessageHelper} should be built.
+ *
+ * @author Bohdan Bachkala
  */
 public interface MimeMessageHelperProvider {
 

@@ -3,6 +3,9 @@ package com.registration.service.impl;
 import com.registration.model.User;
 import com.registration.service.MailService;
 import com.registration.util.EmailBuilder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +17,11 @@ import org.springframework.util.Assert;
 import javax.mail.internet.MimeMessage;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
-    private static final Logger LOG = LoggerFactory.getLogger(MailServiceImpl.class);
-
-    private EmailBuilder emailBuilder;
-    private JavaMailSender mailSender;
-
-    @Autowired
-    public MailServiceImpl(EmailBuilder emailBuilder,
-                           JavaMailSender mailSender) {
-        this.emailBuilder = emailBuilder;
-        this.mailSender = mailSender;
-    }
+    private final EmailBuilder emailBuilder;
+    private final JavaMailSender mailSender;
 
     /**
      * {@inheritDoc}
@@ -34,11 +30,8 @@ public class MailServiceImpl implements MailService {
     @Async
     public void sendEmail(User user) {
         Assert.notNull(user, "User can't be null.");
-
-        MimeMessage email = this.emailBuilder.createEmail(user);
-
+        val email = this.emailBuilder.createEmail(user);
         this.mailSender.send(email);
-
-        LOG.info("Email successfully sent.");
+        log.info("Email successfully sent.");
     }
 }

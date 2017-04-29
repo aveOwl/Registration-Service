@@ -1,18 +1,22 @@
 package com.registration.util;
 
 import com.registration.model.User;
+import lombok.Getter;
+import lombok.val;
 import org.hibernate.validator.constraints.Email;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import javax.validation.constraints.Pattern;
 
 /**
- * <p>
- *     The ValidationResult class defines how response for {@link User} entity
- *     form validation should be built.
- * </p>
+ * The ValidationResult class defines how response for {@link User} entity
+ * form validation should be built.
+ *
+ * @author Bohdan Bachkala
  */
+@Getter
 public class ValidationResult {
 
     /**
@@ -51,8 +55,8 @@ public class ValidationResult {
         this.invalidEmail = bindingResult.hasFieldErrors("email");
         this.invalidPassword = bindingResult.hasFieldErrors("password");
 
-        final StringBuilder emailMessageBuilder = new StringBuilder();
-        final StringBuilder passwordMessageBuilder = new StringBuilder();
+        val emailMessageBuilder = new StringBuilder();
+        val passwordMessageBuilder = new StringBuilder();
 
         // Build Email Violation message.
         if (this.invalidEmail) {
@@ -69,25 +73,5 @@ public class ValidationResult {
             }
         }
         this.passwordViolationMessage = passwordMessageBuilder.toString();
-    }
-
-    public boolean isSuccess() {
-        return this.success;
-    }
-
-    public boolean isInvalidEmail() {
-        return this.invalidEmail;
-    }
-
-    public boolean isInvalidPassword() {
-        return this.invalidPassword;
-    }
-
-    public String getEmailViolationMessage() {
-        return this.emailViolationMessage;
-    }
-
-    public String getPasswordViolationMessage() {
-        return this.passwordViolationMessage;
     }
 }

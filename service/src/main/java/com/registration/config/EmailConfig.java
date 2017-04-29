@@ -1,7 +1,7 @@
 package com.registration.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
@@ -13,8 +13,8 @@ import java.util.Properties;
 
 @Component
 @PropertySource("classpath:application-mail.properties")
+@Slf4j
 public class EmailConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(EmailConfig.class);
 
     @Value("${spring.freemarker.template-loader-path}")
     public String templatePath;
@@ -29,34 +29,31 @@ public class EmailConfig {
 
     @Bean
     public JavaMailSenderImpl mailSender() {
-        final JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        val javaMailSender = new JavaMailSenderImpl();
 
         javaMailSender.setHost(this.mailHost);
         javaMailSender.setPort(Integer.valueOf(this.mailPort));
         javaMailSender.setUsername(this.senderEmail);
         javaMailSender.setPassword(this.senderPassword);
 
-        LOG.debug("Configuring senderEmail properties: {mailHost={}, mailPort={}, senderEmail={}, senderPassword={}}",
+        log.debug("Configuring senderEmail properties: {mailHost={}, mailPort={}, senderEmail={}, senderPassword={}}",
                 this.mailHost, this.mailPort, this.senderEmail, this.senderPassword);
 
-        Properties properties = new Properties();
+        val properties = new Properties();
         properties.put("mail.smtp.starttls.enable", true);
         properties.put("mail.smtp.auth", true);
 
         javaMailSender.setJavaMailProperties(properties);
-        LOG.debug("Configuring mail properties: {}", properties.toString());
+        log.debug("Configuring mail properties: {}", properties.toString());
 
         return javaMailSender;
     }
 
     @Bean
     public FreeMarkerConfigurer freeMarkerConfigurer() {
-        final FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
-
+        val freeMarkerConfigurer = new FreeMarkerConfigurer();
         freeMarkerConfigurer.setTemplateLoaderPath(this.templatePath);
-
-        LOG.debug("Configuring FreeMaker: {template-loader-path={}}", this.templatePath);
-
+        log.debug("Configuring FreeMaker: {template-loader-path={}}", this.templatePath);
         return freeMarkerConfigurer;
     }
 }

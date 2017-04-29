@@ -4,36 +4,31 @@ import com.registration.model.User;
 import com.registration.util.EmailBuilder;
 import com.registration.util.EmailConfigurer;
 import com.registration.util.MimeMessageHelperProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailPreparationException;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
 
 @Service
 @PropertySource("classpath:application-mail.properties")
+@Slf4j
+@RequiredArgsConstructor
 public class EmailBuilderImpl implements EmailBuilder {
-    private static Logger LOG = LoggerFactory.getLogger(EmailBuilderImpl.class);
 
     @Value("${spring.mail.subject}")
     private String subject;
     @Value("${spring.mail.email}")
     private String senderEmail;
 
-    private EmailConfigurer configurer;
-    private MimeMessageHelperProvider helperProvider;
-
-    @Autowired
-    public EmailBuilderImpl(EmailConfigurer configurer, MimeMessageHelperProvider helperProvider) {
-        this.configurer = configurer;
-        this.helperProvider = helperProvider;
-    }
+    private final EmailConfigurer configurer;
+    private final MimeMessageHelperProvider helperProvider;
 
     /**
      * Creates complete email message and handles exceptions that may occur
@@ -42,17 +37,11 @@ public class EmailBuilderImpl implements EmailBuilder {
      * @return completed email message.
      */
     @Override
+    @SneakyThrows
     public MimeMessage createEmail(User user) {
-        try {
-            MimeMessage message = this.getEmailMessage(user);
-
-            LOG.debug("Creating message for User: {}", user);
-
-            return message;
-        } catch (Exception e) {
-            LOG.error("Error while creating email: {}", e.getMessage());
-            throw new MailPreparationException("Failed to create email.", e);
-        }
+        val message = this.getEmailMessage(user);
+        log.debug("Creating message for User: {}", user);
+        return message;
     }
 
     /**
@@ -63,15 +52,14 @@ public class EmailBuilderImpl implements EmailBuilder {
      * @throws Exception on error.
      */
     private MimeMessage getEmailMessage(User user) throws Exception {
-        MimeMessageHelper helper = this.helperProvider.getMimeMessageHelper();
+        val helper = this.helperProvider.getMimeMessageHelper();
 
         if (helper == null) { // TODO should use Optional to avoid this
-            LOG.error("Failed to get message helper, message helper was null.");
             throw new MailPreparationException("Failed to get message helper, message helper was null.");
         }
 
-        Resource logo = this.configurer.getEmailResource();
-        String emailBody = this.configurer.getEmailBody(user);
+        val logo = this.configurer.getEmailResource();
+        val emailBody = this.configurer.getEmailBody(user);
 
         helper.setFrom(this.senderEmail);
         helper.setSubject(this.subject);
@@ -79,10 +67,10 @@ public class EmailBuilderImpl implements EmailBuilder {
         helper.setText(emailBody, true);
         helper.addInline("mail-logo", logo); // image
 
-        LOG.debug("Constructing email: {Sender email address={}, Message subject={}, Recipient email address={}}",
-                  this.senderEmail,
-                  this.subject,
-                  user.getEmail());
+        log.debug("Constructing email: {Sender email address={}, Message subject={}, Recipient email address={}}",
+                this.senderEmail,
+                this.subject,
+                user.getEmail());
 
         return helper.getMimeMessage();
     }

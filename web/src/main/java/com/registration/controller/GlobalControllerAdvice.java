@@ -11,6 +11,8 @@ import javax.persistence.NoResultException;
 /**
  * The MainControllerAdvice class provide a consistent response
  * when Exceptions are thrown from <code>@RequestMapping</code> Controller methods.
+ *
+ * @author Bohdan Bachkala
  */
 @ControllerAdvice
 public class GlobalControllerAdvice {

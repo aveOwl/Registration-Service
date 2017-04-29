@@ -23,6 +23,7 @@
         <coveralls.plugin.version>4.2.0</coveralls.plugin.version>
         <surefire.plugin.version>2.18.1</surefire.plugin.version>
         <gmavenplus.plugin.version>1.5</gmavenplus.plugin.version>
+        <lombok.version>1.16.14</lombok.version>
     </properties>
 
     <modules>
@@ -74,6 +75,11 @@
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
             <version>3.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
         </dependency>
     </dependencies>
 

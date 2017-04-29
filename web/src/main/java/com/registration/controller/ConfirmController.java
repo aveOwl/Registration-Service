@@ -1,6 +1,8 @@
 package com.registration.controller;
 
 import com.registration.service.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,28 +11,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
+@Slf4j
+@RequiredArgsConstructor
 public class ConfirmController {
-    private static final Logger LOG = LoggerFactory.getLogger(ConfirmController.class);
-
-    private UserService userService;
-
-    @Autowired
-    public ConfirmController(final UserService userService) {
-        this.userService = userService;
-    }
+    private final UserService userService;
 
     @GetMapping("/registration/confirm/{code:.*}")
     public String confirm(@PathVariable String code) {
-        LOG.info("Attempting user confirmation...");
-
+        log.info("Attempting user confirmation...");
         this.userService.confirm(code);
-
         return "redirect:/success";
     }
 
     @GetMapping("/success")
     public String confirm() {
-        LOG.info("Rendering success page...");
+        log.info("Rendering success page...");
         return "success-page";
     }
 }

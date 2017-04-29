@@ -6,6 +6,8 @@ import org.springframework.core.io.Resource;
 /**
  * The EmailConfigurer interface defines how an email body
  * should be constructed.
+ *
+ * @author Bohdan Bachkala
  */
 public interface EmailConfigurer {
 
