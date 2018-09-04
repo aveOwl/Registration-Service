@@ -22,6 +22,7 @@ public interface EmailConfigurer {
 
     /**
      * Returns resources for email construction.
+     *
      * @return resources for email construction.
      */
     Resource getEmailResource();

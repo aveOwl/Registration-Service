@@ -2,7 +2,6 @@ package com.registration.util.impl;
 
 import com.registration.model.User;
 import com.registration.util.EmailConfigurer;
-import freemarker.template.Template;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -25,13 +24,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmailConfigurerImpl implements EmailConfigurer {
     private static String CONFIRM_URI = "http://localhost:8080/registration/confirm/"; // TODO deal with this
-
+    private final FreeMarkerConfigurer configurer;
     @Value("${spring.freemarker.view-names}")
     public String templateName;
     @Value("${spring.freemarker.resources}")
     public String resources;
-
-    private final FreeMarkerConfigurer configurer;
 
     /**
      * {@inheritDoc}

@@ -116,7 +116,7 @@ class RegisterControllerSpec extends Specification {
         user.password = VALID_PASSWORD
         def json = mapToJson(user)
 
-        1 * userService.create(user) >> {throw new IllegalArgumentException(TEST_ERROR_MSG)}
+        1 * userService.create(user) >> { throw new IllegalArgumentException(TEST_ERROR_MSG) }
         0 * userService.confirm(user)
 
         expect:

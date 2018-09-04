@@ -4,7 +4,6 @@ import com.registration.model.User;
 import lombok.Getter;
 import lombok.val;
 import org.hibernate.validator.constraints.Email;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 

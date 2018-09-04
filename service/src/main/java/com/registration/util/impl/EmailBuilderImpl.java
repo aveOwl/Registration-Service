@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.io.Resource;
 import org.springframework.mail.MailPreparationException;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +21,12 @@ import javax.mail.internet.MimeMessage;
 @RequiredArgsConstructor
 public class EmailBuilderImpl implements EmailBuilder {
 
+    private final EmailConfigurer configurer;
+    private final MimeMessageHelperProvider helperProvider;
     @Value("${spring.mail.subject}")
     private String subject;
     @Value("${spring.mail.email}")
     private String senderEmail;
-
-    private final EmailConfigurer configurer;
-    private final MimeMessageHelperProvider helperProvider;
 
     /**
      * Creates complete email message and handles exceptions that may occur
